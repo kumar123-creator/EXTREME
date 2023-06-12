@@ -28,7 +28,7 @@
 		  );
 	
 		  if (response.ok) {
-			console.log("CV uploaded successfully!");
+			console.log("CV uploaded successfully");
 			// Perform any additional actions upon successful upload
 		  } else {
 			console.error("CV upload failed.");
