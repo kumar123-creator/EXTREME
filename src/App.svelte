@@ -8,7 +8,7 @@
   let gridData = [];
  
     const fileButtonTemplate = (container, options) => {
-      const candidateId = options.data.e.id;
+      const candidateId = options.data.id;
     const button = document.createElement("button");
    button.className = "btn btn-primary btn-sm";
      button.innerText = "Upload CV";
@@ -18,6 +18,7 @@
     input.accept = "application/pdf"; // Adjust the accepted file types if needed
 
     input.addEventListener("change", async (e) => {
+      console.log("Data being sent to API:", e.options.data);
       const file = e.target.files[0];
       
       if (file) {
