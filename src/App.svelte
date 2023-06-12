@@ -117,7 +117,7 @@
 		  columns: [
 			{ dataField: "id", caption: "ID", width: 250 },
 			{ dataField: "firstName", caption: "First Name", width: 180 },
-			{ dataField: "surname", caption: "Surname", width: 1800 },
+			{ dataField: "surname", caption: "Surname", width: 180 },
 			{ dataField: "email", caption: "Email", width: 180 },
 			{ dataField: "mobile", caption: "Mobile", width: 100 },
 			{
