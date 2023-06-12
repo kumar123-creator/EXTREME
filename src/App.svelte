@@ -115,14 +115,14 @@
 		{
 		  dataSource: gridData,
 		  columns: [
-			{ dataField: "id", caption: "ID", width: 50 },
+			{ dataField: "id", caption: "ID", width: 350 },
 			{ dataField: "firstName", caption: "First Name", width: 200 },
 			{ dataField: "surname", caption: "Surname", width: 200 },
 			{ dataField: "email", caption: "Email", width: 200 },
 			{ dataField: "mobile", caption: "Mobile", width: 150 },
 			{
 			  caption: "Actions",
-			  width: 350,
+			  width: 90,
 			  cellTemplate: function (container, options) {
 				const cvUploadButton = document.createElement("button");
 				cvUploadButton.innerText = "CV Upload";
