@@ -7,40 +7,47 @@
   let jsonData = [];
   let gridData = [];
  
-  button.addEventListener("click", () => {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "application/pdf";
+    const fileButtonTemplate = (container, options) => {
+    const button = document.createElement("button");
+   button.className = "btn btn-primary btn-sm";
+     button.innerText = "Upload CV";
+     button.addEventListener("click", async () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/pdf"; // Adjust the accepted file types if needed
 
-  input.addEventListener("change", async (e) => {
-    const file = e.target.files[0];
+    input.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
 
-    if (file) {
-      try {
-        const formData = new FormData();
-        formData.append("cv", file);
+      if (file) {
+        try {
+          const formData = new FormData();
+          formData.append("cv", file);
 
-        const response = await fetch(
-          `https://api.recruitly.io/api/candidatcv/${options.data.id}/upload?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`,
-          {
-            method: "POST",
-            body: formData,
+          const response = await fetch(
+            `https://api.recruitly.io/api/candidatcv/${options.data.id}/upload?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+
+          if (response.ok) {
+            console.log("CV uploaded successfully");
+          } else {
+            console.error("Failed to upload CV");
           }
-        );
-
-        if (response.ok) {
-          console.log("CV uploaded successfully");
-        } else {
-          console.error("Failed to upload CV");
+        } catch (error) {
+          console.error("Failed to upload CV:", error);
         }
-      } catch (error) {
-        console.error("Failed to upload CV:", error);
       }
-    }
+    });
+
+    input.click();
   });
 
-  input.click();
-});
+  container.appendChild(button);
+};
 
   onMount(async () => {
     const response = await fetch(
