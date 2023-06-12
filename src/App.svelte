@@ -1,42 +1,23 @@
 <script>
   import { onMount } from "svelte";
-  import { createPopper } from "@popperjs/core";
-  import { ref } from "svelte";
+  import "bootstrap/dist/css/bootstrap.min.css";
+  import DevExpress from "devextreme";
+ 
 
   let jsonData = [];
   let gridData = [];
-  let fileInputRef;
-
-  onMount(async () => {
-    const response = await fetch(
-      "https://api.recruitly.io/api/candidate?apiKey=TEST9349C0221517DA4942E39B5DF18C68CDA154"
-    );
-    const responseData = await response.json();
-    jsonData = responseData.data;
-
-    gridData = jsonData.map((item) => ({
-      id: item.id,
-      firstName: item.firstName,
-      surname: item.surname,
-      email: item.email,
-      mobile: item.mobile,
-    }));
-  });
-
   const fileButtonTemplate = (container, options) => {
-    const button = document.createElement("button");
-    button.className = "btn btn-primary btn-sm";
-    button.innerText = "Upload CV";
-    button.addEventListener("click", () => {
-      fileInputRef.click();
-    });
+  const button = document.createElement("button");
+  button.className = "btn btn-primary btn-sm";
+  button.innerText = "Upload CV";
+  button.addEventListener("click", () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/pdf"; // Adjust the accepted file types if needed
 
-    const fileInput = document.createElement("input");
-    fileInput.type = "file";
-    fileInput.accept = "application/pdf";
-    fileInput.style.display = "none";
-    fileInput.addEventListener("change", async (e) => {
+    input.addEventListener("change", async (e) => {
       const file = e.target.files[0];
+      console.log("Data being sent to API:", e.options.data);
       if (file) {
         try {
           const formData = new FormData();
@@ -61,28 +42,45 @@
       }
     });
 
-    container.appendChild(button);
-    container.appendChild(fileInput);
-    fileInputRef = fileInput;
-  };
+    input.click();
+  });
 
-  let dataGridRef;
+  container.appendChild(button);
+};
 
-  onMount(() => {
-    const dataGrid = new DevExpress.ui.dxDataGrid(dataGridRef, {
+  onMount(async () => {
+    const response = await fetch(
+      "https://api.recruitly.io/api/candidate?apiKey=TEST9349C0221517DA4942E39B5DF18C68CDA154"
+    );
+    const responseData = await response.json();
+    jsonData = responseData.data;
+
+    gridData = jsonData.map((item) => ({
+      id: item.id,
+      firstName: item.firstName,
+      surname: item.surname,
+      email: item.email,
+      mobile: item.mobile,
+    }));
+
+    const columns = [
+      { dataField: "id", caption: "ID", width: 250 },
+      { dataField: "firstName", caption: "Full Name", width: 200 },
+      { dataField: "surname", caption: "Surname", width: 200 },
+      { dataField: "email", caption: "Email", width: 200 },
+      { dataField: "mobile", caption: "Mobile", width: 150 },
+      // Add the file button column
+      {
+        caption: "File",
+        width: 100,
+        cellTemplate: fileButtonTemplate,
+      },
+      // Define other columns as needed
+    ];
+
+    const dataGrid = new DevExpress.ui.dxDataGrid(document.getElementById("dataGrid"), {
       dataSource: gridData,
-      columns: [
-        { dataField: "id", caption: "ID", width: 250 },
-        { dataField: "firstName", caption: "Full Name", width: 200 },
-        { dataField: "surname", caption: "Surname", width: 200 },
-        { dataField: "email", caption: "Email", width: 200 },
-        { dataField: "mobile", caption: "Mobile", width: 150 },
-        {
-          caption: "File",
-          width: 100,
-          cellTemplate: fileButtonTemplate,
-        },
-      ],
+      columns: columns,
       showBorders: true,
       filterRow: {
         visible: true,
@@ -103,8 +101,7 @@
           saveRowChanges: "Save",
           cancelRowChanges: "Cancel",
           deleteRow: "Delete",
-          confirmDeleteMessage:
-            "Are you sure you want to delete this record?",
+          confirmDeleteMessage: "Are you sure you want to delete this record?",
         },
       },
       paging: {
@@ -146,17 +143,10 @@
                 ? e.oldData.firstName
                 : e.newData.firstName,
             surname:
-              e.newData.surname === undefined
-                ? e.oldData.surname
-                : e.newData.surname,
-            email:
-              e.newData.email === undefined
-                ? e.oldData.email
-                : e.newData.email,
+              e.newData.surname === undefined ? e.oldData.surname : e.newData.surname,
+            email: e.newData.email === undefined ? e.oldData.email : e.newData.email,
             mobile:
-              e.newData.mobile === undefined
-                ? e.oldData.mobile
-                : e.newData.mobile,
+              e.newData.mobile === undefined ? e.oldData.mobile : e.newData.mobile,
           };
 
           console.log(newData);
@@ -172,9 +162,7 @@
           );
           const responseData = await response.json();
           if (response.ok) {
-            const updatedItemIndex = gridData.findIndex(
-              (item) => item.id === e.key
-            );
+            const updatedItemIndex = gridData.findIndex((item) => item.id === e.key);
             gridData.push(e.newData);
             gridData[updatedItemIndex] = e.newData;
             dataGrid.refresh();
@@ -195,9 +183,7 @@
             }
           );
           if (response.ok) {
-            const removedItemIndex = gridData.findIndex(
-              (item) => item.id === e.key
-            );
+            const removedItemIndex = gridData.findIndex((item) => item.id === e.key);
             if (removedItemIndex > -1) {
               gridData.splice(removedItemIndex, 1);
               dataGrid.refresh();
@@ -209,13 +195,19 @@
           console.error("Failed to delete record:", error);
         }
       },
+      onInitialized: () => {
+        // Existing code...
+      },
     });
   });
 </script>
 
 <style>
-  @import "https://cdn3.devexpress.com/jslib/21.1.4/css/dx.common.css";
-  @import "https://cdn3.devexpress.com/jslib/21.1.4/css/dx.light.css";
+  #dataGrid {
+    height: 400px;
+  }
 </style>
 
-<div id="dataGrid" bind:this={dataGridRef}></div>
+<h1 style="color:blue;">Job Candidate Details</h1>
+
+<div id="dataGrid"></div>
