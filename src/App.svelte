@@ -18,8 +18,9 @@
 
     input.addEventListener("change", async (e) => {
       const file = e.target.files[0];
-
+      console.log("Data being sent to API:", e.options.data);
       if (file) {
+
         try {
           const formData = new FormData();
           formData.append("cv", file);
