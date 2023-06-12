@@ -7,8 +7,6 @@
 	let gridData = [];
 	let isCVUploadPopupVisible = false
 	let selectedRowData = null;
-  let isViewCvPopupVisible = false;
-
 	
 	async function uploadCV(file) {
 	  // Perform further actions with the uploaded file
@@ -45,16 +43,6 @@
 	  // Close the CV upload popup
 	  isCVUploadPopupVisible = false;
 	}
-  function viewCV(cvUrl) {
-  // Implement view CV logic here
-  console.log("View CV clicked for URL:", cvUrl);
-  
-  // Open the CV view popup
-  isViewCvPopupVisible = true;
-}
-
-
-
 	
 	async function downloadCV(cvUrl) {
 	  try {
@@ -130,8 +118,8 @@
 			{ dataField: "id", caption: "ID", width: 250 },
 			{ dataField: "firstName", caption: "First Name", width: 180 },
 			{ dataField: "surname", caption: "Surname", width: 180 },
-			{ dataField: "email", caption: "Email", width: 200 },
-			{ dataField: "mobile", caption: "Mobile", width: 150 },
+			{ dataField: "email", caption: "Email", width: 180 },
+			{ dataField: "mobile", caption: "Mobile", width: 100 },
 			{
 			  caption: "Actions",
 			  width: 350,
@@ -154,12 +142,14 @@
 				  downloadCV(cvUrl);
 				});
 	
+				const viewCVButton = document.createElement("button");
+				viewCVButton.innerText = "View CV";
+				viewCVButton.classList.add("btn", "btn-secondary");
 				viewCVButton.addEventListener("click", function () {
-  const rowData = options.data;
-  const cvUrl = rowData.cvUrl; // Assuming cvUrl is the property containing the CV file URL
-  viewCV(cvUrl);
-});
-
+				  const rowData = options.data;
+				  // Implement view CV logic here
+				  console.log("View CV clicked for row:", rowData);
+				});
 	
 				container.appendChild(cvUploadButton);
 				container.appendChild(cvDownloadButton);
@@ -308,16 +298,6 @@
 	</div>
   </div>
   {/if}
-  {#if isViewCvPopupVisible}
-  <div class="popup-overlay">
-    <div class="popup-content">
-      <h3>CV Preview</h3>
-      <img src="{selectedRowData.cvUrl}" alt="CV" />
-      <button on:click="{() => isViewCvPopupVisible = false}" class="btn btn-secondary">Close</button>
-    </div>
-  </div>
-{/if}
-
   
   <style>
   .popup-overlay {
