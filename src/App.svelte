@@ -9,7 +9,7 @@
   const fileButtonTemplate = (container, options) => {
     const button = document.createElement("button");
     button.className = "btn btn-primary btn-sm";
-    button.innerText = "File";
+    button.innerText = "CVFile";
     button.addEventListener("click", () => {
       // Handle file button click event here
       console.log("File button clicked for row with ID:", options.data.id);
