@@ -224,9 +224,9 @@
 <div class="popup-overlay">
   <div class="popup-content">
     <h3>View CV</h3>
-    {#if selectedCvUrl.endsWith('.pdf')}
+    {#if selectedCvUrl && selectedCvUrl.endsWith && selectedCvUrl.endsWith('.pdf')}
       <embed src="{selectedCvUrl}" type="application/pdf" width="100%" height="600px" />
-    {:else if selectedCvUrl.endsWith('.docx') || selectedCvUrl.endsWith('.doc')}
+    {:else if selectedCvUrl && (selectedCvUrl.endsWith('.docx') || selectedCvUrl.endsWith('.doc'))}
       <iframe src="https://view.officeapps.live.com/op/view.aspx?src={selectedCvUrl}" width="100%" height="600px"></iframe>
     {:else}
       <p>Unsupported file format. Unable to view the CV.</p>
