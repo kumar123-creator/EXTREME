@@ -38,6 +38,10 @@
           link.download = "CV";
           link.className = "btn btn-primary";
           container.appendChild(link);
+
+          link.addEventListener("click", () => {
+            window.alert("CV successfully downloaded!"); // Display success message
+          });
         },
       },
       // Define other columns as needed
