@@ -1,27 +1,43 @@
 <script>
   import { onMount } from "svelte";
-  import "bootstrap/dist/css/bootstrap.min.css";
-  import DevExpress from "devextreme";
+  import { createPopper } from "@popperjs/core";
+  import { ref } from "svelte";
 
   let jsonData = [];
   let gridData = [];
- 
+  let fileInputRef;
+
+  onMount(async () => {
+    const response = await fetch(
+      "https://api.recruitly.io/api/candidate?apiKey=TEST9349C0221517DA4942E39B5DF18C68CDA154"
+    );
+    const responseData = await response.json();
+    jsonData = responseData.data;
+
+    gridData = jsonData.map((item) => ({
+      id: item.id,
+      firstName: item.firstName,
+      surname: item.surname,
+      email: item.email,
+      mobile: item.mobile,
+    }));
+  });
+
   const fileButtonTemplate = (container, options) => {
-  const button = document.createElement("button");
-  button.className = "btn btn-primary btn-sm";
-  button.innerText = "Upload CV";
-  button.addEventListener("click", () => {
+    const button = document.createElement("button");
+    button.className = "btn btn-primary btn-sm";
+    button.innerText = "Upload CV";
+    button.addEventListener("click", () => {
+      fileInputRef.click();
+    });
+
     const fileInput = document.createElement("input");
     fileInput.type = "file";
-    fileInput.accept = "application/pdf"; // Adjust the accepted file types if needed
-
-    const saveButton = document.createElement("button");
-    saveButton.className = "btn btn-primary";
-    saveButton.innerText = "Save";
-    saveButton.addEventListener("click", async () => {
-      if (fileInput.files.length > 0) {
-        const file = fileInput.files[0];
-        
+    fileInput.accept = "application/pdf";
+    fileInput.style.display = "none";
+    fileInput.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (file) {
         try {
           const formData = new FormData();
           formData.append("cv", file);
@@ -43,70 +59,30 @@
           console.error("Failed to upload CV:", error);
         }
       }
-
-      popup.hide();
     });
 
-    const closeButton = document.createElement("button");
-    closeButton.className = "btn btn-secondary ml-2";
-    closeButton.innerText = "Close";
-    closeButton.addEventListener("click", () => {
-      popup.hide();
-    });
+    container.appendChild(button);
+    container.appendChild(fileInput);
+    fileInputRef = fileInput;
+  };
 
-    const popupContent = document.createElement("div");
-    popupContent.appendChild(fileInput);
-    popupContent.appendChild(saveButton);
-    popupContent.appendChild(closeButton);
+  let dataGridRef;
 
-    const popup = new DevExpress.ui.dxPopup(popupContent, {
-      title: "Upload CV",
-      closeOnOutsideClick: true,
-      height: "auto",
-      width: 300,
-    });
-
-    popup.show();
-  });
-
-  container.appendChild(button);
-};
-
-
-
-  onMount(async () => {
-    const response = await fetch(
-      "https://api.recruitly.io/api/candidate?apiKey=TEST9349C0221517DA4942E39B5DF18C68CDA154"
-    );
-    const responseData = await response.json();
-    jsonData = responseData.data;
-
-    gridData = jsonData.map((item) => ({
-      id: item.id,
-      firstName: item.firstName,
-      surname: item.surname,
-      email: item.email,
-      mobile: item.mobile,
-    }));
-
-    const columns = [
-      { dataField: "id", caption: "ID", width: 250 },
-      { dataField: "firstName", caption: "Full Name", width: 200 },
-      { dataField: "surname", caption: "Surname", width: 200 },
-      { dataField: "email", caption: "Email", width: 200 },
-      { dataField: "mobile", caption: "Mobile", width: 150 },
-      // Add the file button column
-      {
-        caption: "File",
-        width: 100,
-        cellTemplate: fileButtonTemplate,
-      },
-      // Define other columns as needed
-    ];
-
-    const dataGrid = new DevExpress.ui.dxDataGrid(document.getElementById("dataGrid"), {
+  onMount(() => {
+    const dataGrid = new DevExpress.ui.dxDataGrid(dataGridRef, {
       dataSource: gridData,
-      columns: columns,
+      columns: [
+        { dataField: "id", caption: "ID", width: 250 },
+        { dataField: "firstName", caption: "Full Name", width: 200 },
+        { dataField: "surname", caption: "Surname", width: 200 },
+        { dataField: "email", caption: "Email", width: 200 },
+        { dataField: "mobile", caption: "Mobile", width: 150 },
+        {
+          caption: "File",
+          width: 100,
+          cellTemplate: fileButtonTemplate,
+        },
+      ],
       showBorders: true,
       filterRow: {
         visible: true,
@@ -127,7 +103,8 @@
           saveRowChanges: "Save",
           cancelRowChanges: "Cancel",
           deleteRow: "Delete",
-          confirmDeleteMessage: "Are you sure you want to delete this record?",
+          confirmDeleteMessage:
+            "Are you sure you want to delete this record?",
         },
       },
       paging: {
@@ -169,10 +146,17 @@
                 ? e.oldData.firstName
                 : e.newData.firstName,
             surname:
-              e.newData.surname === undefined ? e.oldData.surname : e.newData.surname,
-            email: e.newData.email === undefined ? e.oldData.email : e.newData.email,
+              e.newData.surname === undefined
+                ? e.oldData.surname
+                : e.newData.surname,
+            email:
+              e.newData.email === undefined
+                ? e.oldData.email
+                : e.newData.email,
             mobile:
-              e.newData.mobile === undefined ? e.oldData.mobile : e.newData.mobile,
+              e.newData.mobile === undefined
+                ? e.oldData.mobile
+                : e.newData.mobile,
           };
 
           console.log(newData);
@@ -188,7 +172,9 @@
           );
           const responseData = await response.json();
           if (response.ok) {
-            const updatedItemIndex = gridData.findIndex((item) => item.id === e.key);
+            const updatedItemIndex = gridData.findIndex(
+              (item) => item.id === e.key
+            );
             gridData.push(e.newData);
             gridData[updatedItemIndex] = e.newData;
             dataGrid.refresh();
@@ -209,7 +195,9 @@
             }
           );
           if (response.ok) {
-            const removedItemIndex = gridData.findIndex((item) => item.id === e.key);
+            const removedItemIndex = gridData.findIndex(
+              (item) => item.id === e.key
+            );
             if (removedItemIndex > -1) {
               gridData.splice(removedItemIndex, 1);
               dataGrid.refresh();
@@ -221,19 +209,13 @@
           console.error("Failed to delete record:", error);
         }
       },
-      onInitialized: () => {
-        // Existing code...
-      },
     });
   });
 </script>
 
 <style>
-  #dataGrid {
-    height: 400px;
-  }
+  @import "https://cdn3.devexpress.com/jslib/21.1.4/css/dx.common.css";
+  @import "https://cdn3.devexpress.com/jslib/21.1.4/css/dx.light.css";
 </style>
 
-<h1 style="color:blue;">Job Candidate Details</h1>
-
-<div id="dataGrid"></div>
+<div id="dataGrid" bind:this={dataGridRef}></div>
