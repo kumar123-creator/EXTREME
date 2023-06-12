@@ -21,7 +21,7 @@
     saveButton.addEventListener("click", async () => {
       if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
-        console.log("CV being sent to API:", e.options.data);
+        
         try {
           const formData = new FormData();
           formData.append("cv", file);
