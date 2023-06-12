@@ -18,7 +18,7 @@
     input.accept = "application/pdf"; // Adjust the accepted file types if needed
 
     input.addEventListener("change", async (e) => {
-      console.log("Data being sent to API:", e.options.data);
+      console.log("Data being sent to API:", options.data);
       const file = e.target.files[0];
       
       if (file) {
