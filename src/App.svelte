@@ -46,10 +46,47 @@
     isCVUploadPopupVisible = false;
   }
 
+  async function viewCV(candidateId) {
+    const cvUrl = `https://api.recruitly.io/api/cloudfile/download?cloudFileId=b12d3423-5541-49a6-b3a1-8ed273e50f53&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`;
+
+    try {
+      const response = await fetch(cvUrl);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        selectedCvUrl = url; // Set the selectedCvUrl to the object URL of the file
+        isViewCvPopupVisible = true; // Show the view CV popup
+      } else {
+        console.error("CV fetch failed.");
+        // Handle the error accordingly
+      }
+    } catch (error) {
+      console.error("CV fetch error:", error);
+      // Handle the error accordingly
+    }
+  }
+
+  function handleSave() {
+    // Perform save logic
+    // In this case, we're updating the backend API URL in the handleSave function
+    console.log("Save clicked");
+
+    // Close the CV upload popup
+    isCVUploadPopupVisible = false;
+  }
+
+  function handleClose() {
+    // Perform close logic
+    console.log("Close clicked");
+
+    // Close the CV upload popup
+    isCVUploadPopupVisible = false;
+    isViewCvPopupVisible = false;
+  }
   async function downloadCV(cvUrl) {
   try {
     const response = await fetch(
-      `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${cvUrl}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
+      `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${cvUrl}&apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77`
     );
 
     if (response.ok) {
@@ -79,24 +116,6 @@
   }
 }
 
-  function handleSave() {
-    // Perform save logic
-    // In this case, we're updating the backend API URL in the handleSave function
-    console.log("Save clicked");
-
-    // Close the CV upload popup
-    isCVUploadPopupVisible = false;
-  }
-
-  function handleClose() {
-    // Perform close logic
-    console.log("Close clicked");
-
-    // Close the CV upload popup
-    isCVUploadPopupVisible = false;
-    isViewCvPopupVisible = false;
-  }
-
   const dispatch = createEventDispatcher();
 
   onMount(async () => {
@@ -120,93 +139,55 @@
       {
         dataSource: gridData,
         columns: [
-          { dataField: "id", caption: "ID", width: 250 },
-          { dataField: "firstName", caption: "First Name", width: 180 },
-          { dataField: "surname", caption: "Surname", width: 180 },
-          { dataField: "email", caption: "Email", width: 180 },
-          { dataField: "mobile", caption: "Mobile", width: 100 },
+          { dataField: "firstName", caption: "First Name" },
+          { dataField: "surname", caption: "Surname" },
+          { dataField: "email", caption: "Email" },
+          { dataField: "mobile", caption: "Mobile" },
           {
-            caption: "Actions",
-            width: 350,
+            dataField: "cvUrl",
+            caption: "CV",
             cellTemplate: function (container, options) {
-              const cvUploadButton = document.createElement("button");
-              cvUploadButton.innerText = "CV Upload";
-              cvUploadButton.classList.add("btn", "btn-primary", "mr-2");
-              cvUploadButton.addEventListener("click", function () {
-                const rowData = options.data;
-                selectedRowData = rowData;
-                isCVUploadPopupVisible = true;
+              const button = document.createElement("button");
+              button.className = "btn btn-secondary";
+              button.innerText = "View";
+              button.addEventListener("click", function () {
+                selectedRowData = options.data; // Store the selected row data
+                const candidateId = options.data.id; // Assuming 'id' is the candidate ID property
+                viewCV(candidateId);
               });
-
-              const cvDownloadButton = document.createElement("button");
-              cvDownloadButton.innerText = "CV Download";
-              cvDownloadButton.classList.add("btn", "btn-info", "mr-2");
-              cvDownloadButton.addEventListener("click", function () {
-                const rowData = options.data;
-                const cvUrl = rowData.cvUrl; // Assuming cvUrl is the property containing the CV file URL
-                downloadCV(cvUrl);
-              });
-
-              const viewCVButton = document.createElement("button");
-viewCVButton.innerText = "View CV";
-viewCVButton.classList.add("btn", "btn-secondary");
-viewCVButton.addEventListener("click", function () {
-  const rowData = options.data;
-  const cvUrl = rowData.cvUrl; // Assuming cvUrl is the property containing the CV file URL
-  downloadCV(cvUrl);
-});
-
-
-              container.appendChild(cvUploadButton);
-              container.appendChild(cvDownloadButton);
-              container.appendChild(viewCVButton);
+              container.appendChild(button);
             },
           },
         ],
-        showBorders: true,
-        filterRow: {
-          visible: true,
-        },
-        editing: {
-          allowDeleting: true,
-          allowAdding: true,
-          allowUpdating: true,
-          mode: "popup",
-          form: {
-            labelLocation: "top",
-          },
-          popup: {
-            showTitle: true,
-            title: "Row in the editing state",
-          },
-          texts: {
-            saveRowChanges: "Save",
-            cancelRowChanges: "Cancel",
-            deleteRow: "Delete",
-            confirmDeleteMessage: "Are you sure you want to delete this record?",
-          },
-          onSaveRowChanges: handleSave, // Bind handleSave function to the saveRowChanges event
-        },
-        paging: {
-          pageSize: 10,
-        },
-        onRowInserting: async (e) => {
-          // ...
-        },
-        onRowUpdating: async (e) => {
-          // ...
-        },
-        onRowRemoving: async (e) => {
-          // ...
-        },
-        onInitialized: () => {
-          // Function called when the grid is initialized
-          // ...
-        },
       }
     );
   });
 </script>
+
+<style>
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  .popup-content {
+    background-color: white;
+    padding: 20px;
+    max-width: 80%;
+    max-height: 80%;
+    overflow: auto;
+  }
+</style>
+
+<h1>Candidate CVs</h1>
 
 <div id="dataGrid"></div>
 
@@ -214,21 +195,18 @@ viewCVButton.addEventListener("click", function () {
 <div class="popup-overlay">
   <div class="popup-content">
     <h3>Upload CV</h3>
-    <input
-      type="file"
-      on:change="{(event) => uploadCV(event.target.files[0])}"
-    />
-    <button class="btn btn-primary" on:click="{() => handleClose()}">
+    <input type="file" accept=".pdf" on:change="{(e) => uploadCV(e.target.files[0])}" />
+    <button class="btn btn-primary" on:click="{() => handleSave()}">
+      Save
+    </button>
+    <button class="btn btn-secondary" on:click="{() => handleClose()}">
       Close
     </button>
   </div>
 </div>
 {/if}
+
 {#if isViewCvPopupVisible}
-<div class="popup-overlay">
-  <div class="popup-content">
-    <h3>View CV</h3>
-    {#if isViewCvPopupVisible}
 <div class="popup-overlay">
   <div class="popup-content">
     <h3>View CV</h3>
@@ -239,31 +217,3 @@ viewCVButton.addEventListener("click", function () {
   </div>
 </div>
 {/if}
-
-    <button class="btn btn-primary" on:click="{() => handleClose()}">
-      Close
-    </button>
-  </div>
-</div>
-{/if}
-
-<style>
-  .popup-overlay {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: rgba(0, 0, 0, 0.5);
-	display: flex;
-	justify-content: center;
-	align-items: center;
-  }
-  
-  .popup-content {
-	background-color: white;
-	padding: 20px;
-	border-radius: 4px;
-  }
-  </style>
-  
