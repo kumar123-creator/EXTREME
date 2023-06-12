@@ -33,7 +33,7 @@
         { dataField: "email", caption: "Email", width: 200 },
         { dataField: "mobile", caption: "Mobile", width: 150 },
         {
-			  caption: "Files",
+			  caption: "Actions",
 			  width: 400,
 			  cellTemplate: function (container, options) {
 				const cvUploadButton = document.createElement("button");
