@@ -225,10 +225,30 @@
 <div class="popup-overlay">
   <div class="popup-content">
     <h3>View CV</h3>
-    <a href="{selectedCvUrl}" target="_blank">Open CV</a>
+    <img src="{selectedCvUrl}" alt="CV Image" />
     <button class="btn btn-primary" on:click="{() => handleClose()}">
       Close
     </button>
   </div>
 </div>
 {/if}
+<style>
+  .popup-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+  }
+  
+  .popup-content {
+	background-color: white;
+	padding: 20px;
+	border-radius: 4px;
+  }
+  </style>
+  
