@@ -147,12 +147,13 @@
                 downloadCV(cvUrl);
               });
               const viewCVButton = document.createElement("button");
-				       viewCVButton.innerText = "View CV";
-				       viewCVButton.classList.add("btn", "btn-secondary");
-				       viewCVButton.addEventListener("click", function () {
-				      const rowData = options.data;
-				       const cvUrl = rowData.cvUrl; // Assuming cvUrl is the property containing the CV file URL
-				      openCVViewPopup(cvUrl);
+viewCVButton.innerText = "View CV";
+viewCVButton.classList.add("btn", "btn-secondary");
+viewCVButton.addEventListener("click", function () {
+  const rowData = options.data;
+  const cvFileId = rowData.cvUrl.split('/').pop();
+  const cvUrl = `https://api.recruitly.io/api/candidatecv/${cvFileId}?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`;
+  openCVViewPopup(cvUrl);
 				  // Implement view CV logic here
 				      console.log("View CV:", rowData);
 				     });
@@ -243,6 +244,17 @@
 </div>
 {/if}
 
+    <button class="btn btn-primary" on:click="{() => handleClose()}">
+      Close
+    </button>
+  </div>
+</div>
+{/if}
+{#if isViewCvPopupVisible}
+<div class="popup-overlay">
+  <div class="popup-content">
+    <h3>View CV</h3>
+    <iframe src="{selectedCvUrl}" width="100%" height="600px"></iframe>
     <button class="btn btn-primary" on:click="{() => handleClose()}">
       Close
     </button>
