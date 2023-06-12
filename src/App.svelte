@@ -8,7 +8,7 @@
   let gridData = [];
  
     const fileButtonTemplate = (container, options) => {
-      const candidateId = options.data.id;
+      const candidateId = options.data.key.id;
     const button = document.createElement("button");
    button.className = "btn btn-primary btn-sm";
      button.innerText = "Upload CV";
