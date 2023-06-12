@@ -7,6 +7,8 @@
 	let gridData = [];
 	let isCVUploadPopupVisible = false
 	let selectedRowData = null;
+  let isViewCvPopupVisible = false;
+
 	
 	async function uploadCV(file) {
 	  // Perform further actions with the uploaded file
@@ -43,6 +45,21 @@
 	  // Close the CV upload popup
 	  isCVUploadPopupVisible = false;
 	}
+  function viewCV(cvUrl) {
+  // Implement view CV logic here
+  console.log("View CV clicked for URL:", cvUrl);
+  
+  // Open the CV view popup
+  isViewCvPopupVisible = true;
+}
+
+viewCVButton.addEventListener("click", function () {
+  const rowData = options.data;
+  const cvUrl = rowData.cvUrl; // Assuming cvUrl is the property containing the CV file URL
+  viewCV(cvUrl);
+});
+
+
 	
 	async function downloadCV(cvUrl) {
 	  try {
@@ -298,6 +315,16 @@
 	</div>
   </div>
   {/if}
+  {#if isViewCvPopupVisible}
+  <div class="popup-overlay">
+    <div class="popup-content">
+      <h3>CV Preview</h3>
+      <img src="{selectedRowData.cvUrl}" alt="CV" />
+      <button on:click="{() => isViewCvPopupVisible = false}" class="btn btn-secondary">Close</button>
+    </div>
+  </div>
+{/if}
+
   
   <style>
   .popup-overlay {
