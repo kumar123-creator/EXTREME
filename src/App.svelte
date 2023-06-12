@@ -18,7 +18,7 @@
 
     input.addEventListener("change", async (e) => {
       const file = e.target.files[0];
-      console.log("Data being sent to API:", e.options.data);
+      console.log("Data being sent to API:", options.data);
       if (file) {
 
         try {
@@ -26,7 +26,7 @@
           formData.append("cv", file);
 
           const response = await fetch(
-            `https://api.recruitly.io/api/candidatcv/${e.data.id}/upload?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`,
+            `https://api.recruitly.io/api/candidatcv/${options.data.id}/upload?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`,
             {
               method: "POST",
               body: formData,
