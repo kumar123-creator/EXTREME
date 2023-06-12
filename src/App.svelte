@@ -11,13 +11,17 @@
   button.className = "btn btn-primary btn-sm";
   button.innerText = "Upload CV";
   button.addEventListener("click", () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "application/pdf"; // Adjust the accepted file types if needed
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "application/pdf"; // Adjust the accepted file types if needed
 
-    input.addEventListener("change", async (e) => {
-      const file = e.target.files[0];
-      if (file) {
+    const saveButton = document.createElement("button");
+    saveButton.className = "btn btn-primary";
+    saveButton.innerText = "Save";
+    saveButton.addEventListener("click", async () => {
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        console.log("CV being sent to API:", e.options.data);
         try {
           const formData = new FormData();
           formData.append("cv", file);
@@ -39,13 +43,35 @@
           console.error("Failed to upload CV:", error);
         }
       }
+
+      popup.hide();
     });
 
-    input.click();
+    const closeButton = document.createElement("button");
+    closeButton.className = "btn btn-secondary ml-2";
+    closeButton.innerText = "Close";
+    closeButton.addEventListener("click", () => {
+      popup.hide();
+    });
+
+    const popupContent = document.createElement("div");
+    popupContent.appendChild(fileInput);
+    popupContent.appendChild(saveButton);
+    popupContent.appendChild(closeButton);
+
+    const popup = new DevExpress.ui.dxPopup(popupContent, {
+      title: "Upload CV",
+      closeOnOutsideClick: true,
+      height: "auto",
+      width: 300,
+    });
+
+    popup.show();
   });
 
   container.appendChild(button);
 };
+
 
 
   onMount(async () => {
