@@ -6,7 +6,9 @@
   let jsonData = [];
   let gridData = [];
   let isCVUploadPopupVisible = false;
+  let isViewCvPopupVisible = false;
   let selectedRowData = null;
+  let selectedCvUrl = null;
 
   async function uploadCV(file) {
     // Perform further actions with the uploaded file
@@ -29,8 +31,7 @@
 
         if (response.ok) {
           console.log("CV uploaded successfully");
-          isCVUploadPopupVisible = false; // Close the CV upload popup
-          alert("CV uploaded successfully!"); // Display success message
+          // Perform any additional actions upon successful upload
         } else {
           console.error("CV upload failed.");
           // Handle the error accordingly
@@ -40,20 +41,6 @@
         // Handle the error accordingly
       }
     }
-  }
-
-  function handleSave() {
-    // Perform save logic
-    // In this case, we're updating the backend API URL in the handleSave function
-    console.log("Save clicked");
-
-    // Close the CV upload popup
-    isCVUploadPopupVisible = false;
-  }
-
-  function handleClose() {
-    // Perform close logic
-    console.log("Close clicked");
 
     // Close the CV upload popup
     isCVUploadPopupVisible = false;
@@ -87,6 +74,24 @@
       console.error("CV download error:", error);
       // Handle the error accordingly
     }
+  }
+
+  function handleSave() {
+    // Perform save logic
+    // In this case, we're updating the backend API URL in the handleSave function
+    console.log("Save clicked");
+
+    // Close the CV upload popup
+    isCVUploadPopupVisible = false;
+  }
+
+  function handleClose() {
+    // Perform close logic
+    console.log("Close clicked");
+
+    // Close the CV upload popup
+    isCVUploadPopupVisible = false;
+    isViewCvPopupVisible = false;
   }
 
   const dispatch = createEventDispatcher();
@@ -144,8 +149,8 @@
               viewCVButton.classList.add("btn", "btn-secondary");
               viewCVButton.addEventListener("click", function () {
                 const rowData = options.data;
-                // Implement view CV logic here
-                console.log("View CV clicked for row:", rowData);
+                selectedCvUrl = rowData.cvUrl; // Assuming cvUrl is the property containing the CV file URL
+                isViewCvPopupVisible = true;
               });
 
               container.appendChild(cvUploadButton);
@@ -208,31 +213,48 @@
     <input
       type="file"
       on:change="{(event) => uploadCV(event.target.files[0])}"
-      accept=".pdf,.doc,.docx"
     />
-    <button class="btn btn-primary" on:click="{handleSave}">Save</button>
-    <button class="btn btn-secondary" on:click="{handleClose}">Close</button>
+    <button class="btn btn-primary" on:click="{() => handleClose()}">
+      Close
+    </button>
+  </div>
+</div>
+{/if}
+{#if isViewCvPopupVisible}
+<div class="popup-overlay">
+  <div class="popup-content">
+    <h3>View CV</h3>
+    {#if selectedCvUrl.endsWith('.pdf')}
+      <embed src="{selectedCvUrl}" type="application/pdf" width="100%" height="600px" />
+    {:else if selectedCvUrl.endsWith('.docx') || selectedCvUrl.endsWith('.doc')}
+      <iframe src="https://view.officeapps.live.com/op/view.aspx?src={selectedCvUrl}" width="100%" height="600px"></iframe>
+    {:else}
+      <p>Unsupported file format. Unable to view the CV.</p>
+    {/if}
+    <button class="btn btn-primary" on:click="{() => handleClose()}">
+      Close
+    </button>
   </div>
 </div>
 {/if}
 
 <style>
   .popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
   }
-
+  
   .popup-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 5px;
+	background-color: white;
+	padding: 20px;
+	border-radius: 4px;
   }
-</style>
+  </style>
+  
