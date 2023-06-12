@@ -31,7 +31,7 @@
             `https://api.recruitly.io/api/candidatcv/${candidateId}/upload?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`,
              {
                  method: "POST",
-                 body: formData,
+                 body: multipart/form-data,
                               }
                 );
 
