@@ -1,64 +1,21 @@
+<h1 style="color:blue;">Job Candidate Details</h1> 
 <script>
   import { onMount } from "svelte";
   import "bootstrap/dist/css/bootstrap.min.css";
   import DevExpress from "devextreme";
- 
-
+  
   let jsonData = [];
   let gridData = [];
- 
-    const fileButtonTemplate = (container, options) => {
-      const candidateId = options?.data?.id;
-    const button = document.createElement("button");
-   button.className = "btn btn-primary btn-sm";
-     button.innerText = "Upload CV";
-     button.addEventListener("click", async () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "application/pdf"; // Adjust the accepted file types if needed
-
-    input.addEventListener("change", async (e) => {
-      console.log("Data being sent to API:", options?.data);
-      const file = e.target.files[0];
-      
-      if (file) {
-
-        try {
-          const formData = new FormData();
-          formData.append("file", file);
-
-          const response = await fetch(
-            `https://api.recruitly.io/api/candidatcv/${candidateId}/upload?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`,
-             {
-                 method: "POST",
-                 body: multipart/form-data,
-                              }
-                );
-
-          if (response.ok) {
-            console.log("CV uploaded successfully");
-          } else {
-            console.error("Failed to upload CV");
-          }
-        } catch (error) {
-          console.error("Failed to upload CV:", error);
-        }
-      }
-    });
-
-    input.click();
-  });
-
-  container.appendChild(button);
-};
-
+  let isCVUploadPopupVisible = false;
+	let selectedRowData = null;
+  
   onMount(async () => {
     const response = await fetch(
       "https://api.recruitly.io/api/candidate?apiKey=TEST9349C0221517DA4942E39B5DF18C68CDA154"
     );
     const responseData = await response.json();
     jsonData = responseData.data;
-
+  
     gridData = jsonData.map((item) => ({
       id: item.id,
       firstName: item.firstName,
@@ -66,25 +23,32 @@
       email: item.email,
       mobile: item.mobile,
     }));
-
-    const columns = [
-      { dataField: "id", caption: "ID", width: 250 },
-      { dataField: "firstName", caption: "Full Name", width: 200 },
-      { dataField: "surname", caption: "Surname", width: 200 },
-      { dataField: "email", caption: "Email", width: 200 },
-      { dataField: "mobile", caption: "Mobile", width: 150 },
-      // Add the file button column
-      {
-        caption: "File",
-        width: 100,
-        cellTemplate: fileButtonTemplate,
-      },
-      // Define other columns as needed
-    ];
-
+  
     const dataGrid = new DevExpress.ui.dxDataGrid(document.getElementById("dataGrid"), {
       dataSource: gridData,
-      columns: columns,
+      columns: [
+        { dataField: "id", caption: "ID", width: 250 },
+        { dataField: "firstName", caption: "Full Name", width: 200 },
+        { dataField: "surname", caption: "Surname", width: 200 },
+        { dataField: "email", caption: "Email", width: 200 },
+        { dataField: "mobile", caption: "Mobile", width: 150 },
+        {
+			  caption: "Files",
+			  width: 400,
+			  cellTemplate: function (container, options) {
+				const cvUploadButton = document.createElement("button");
+				cvUploadButton.innerText = "CV Upload";
+				cvUploadButton.classList.add("btn", "btn-success", "mr-2");
+				cvUploadButton.addEventListener("click", function () {
+				  const rowData = options.data;
+				  selectedRowData = rowData;
+				  isCVUploadPopupVisible = true;
+          container.appendChild(cvUploadButton);
+				});
+      }}
+	
+        // Define other columns as needed
+      ],
       showBorders: true,
       filterRow: {
         visible: true,
@@ -124,7 +88,7 @@
               body: JSON.stringify(e.data),
             }
           );
-
+  
           const responseData = await response.json();
           if (response.ok) {
             e.data.firstName = responseData.firstName;
@@ -142,18 +106,13 @@
           console.log(e);
           var newData = {
             id: e.key.id,
-            firstName:
-              e.newData.firstName === undefined
-                ? e.oldData.firstName
-                : e.newData.firstName,
-            surname:
-              e.newData.surname === undefined ? e.oldData.surname : e.newData.surname,
+            firstName: e.newData.firstName === undefined ? e.oldData.firstName : e.newData.firstName,
+            surname: e.newData.surname === undefined ? e.oldData.surname : e.newData.surname,
             email: e.newData.email === undefined ? e.oldData.email : e.newData.email,
-            mobile:
-              e.newData.mobile === undefined ? e.oldData.mobile : e.newData.mobile,
-          };
-
-          console.log(newData);
+            mobile: e.newData.mobile === undefined ? e.oldData.mobile : e.newData.mobile,
+          }
+  
+          console.log(newData)
           const response = await fetch(
             `https://api.recruitly.io/api/candidate?apiKey=TEST9349C0221517DA4942E39B5DF18C68CDA154`,
             {
@@ -177,7 +136,7 @@
           console.error("Failed to update record:", error);
         }
       },
-        onRowRemoving: async (e) => {
+      onRowRemoving: async (e) => {
         console.log("Data being sent to API:", e.data);
         try {
           const response = await fetch(
@@ -195,23 +154,52 @@
           } else {
             console.error("Failed to delete record.");
           }
-        } catch (error) {
+          } catch (error) {
           console.error("Failed to delete record:", error);
-        }
-      },
-      onInitialized: () => {
-        // Existing code...
-      },
-    });
-  });
+          }
+        },
+            onInitialized: () => {
+  
+           },
+          });
+           });
+
+                
+	      async function uploadCV(file) {
+	  // Perform further actions with the uploaded file
+	
+	  // Example: Update the backend API URL with the file upload
+	  const formData = new FormData();
+	  formData.append("file", file);
+	
+	  if (selectedRowData) {
+		const uploadCandidateId = selectedRowData.id; // Get the candidate ID from selectedRowData
+	
+		try {
+		  const response = await fetch(
+			`https://api.recruitly.io/api/candidatecv/upload?apiKey=TEST1236C4CF23E6921C41429A6E1D546AC9535E&candidateId=${uploadCandidateId}`,
+			{
+			  method: "POST",
+			  body: formData,
+			}
+		  );
+	
+		  if (response.ok) {
+			console.log("CV uploaded successfully!");
+			// Perform any additional actions upon successful upload
+		  } else {
+			console.error("CV upload failed.");
+			// Handle the error accordingly
+		  }
+		} catch (error) {
+		  console.error("CV upload error:", error);
+		  // Handle the error accordingly
+		}
+	  }
+	
+	  // Close the CV upload popup
+	  isCVUploadPopupVisible = false;
+	}
+	
 </script>
-
-<style>
-  #dataGrid {
-    height: 400px;
-  }
-</style>
-
-<h1 style="color:blue;">Job Candidate Details</h1>
-
 <div id="dataGrid"></div>
