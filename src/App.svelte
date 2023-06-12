@@ -25,7 +25,7 @@
 
         try {
           const formData = new FormData();
-          formData.append("cv", file);
+          formData.append("file", file);
 
           const response = await fetch(
             `https://api.recruitly.io/api/candidatcv/${candidateId}/upload?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`,
