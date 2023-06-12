@@ -5,7 +5,7 @@
 	
 	let jsonData = [];
 	let gridData = [];
-	let isCVUploadPopupVisible = false;
+	let isCVUploadPopupVisible = false
 	let selectedRowData = null;
 	
 	async function uploadCV(file) {
@@ -20,7 +20,7 @@
 	
 		try {
 		  const response = await fetch(
-			`https://api.recruitly.io/api/candidatecv/upload?apiKey=TEST1236C4CF23E6921C41429A6E1D546AC9535E&candidateId=${uploadCandidateId}`,
+			`https://api.recruitly.io/api/candidatecv/upload?apiKey=apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA&candidateId=${uploadCandidateId}`,
 			{
 			  method: "POST",
 			  body: formData,
@@ -47,7 +47,7 @@
 	async function downloadCV(cvUrl) {
 	  try {
 		const response = await fetch(
-		  `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${cvUrl}&apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77`
+		  `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${cvUrl}&apiKey=apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
 		);
 	
 		if (response.ok) {
@@ -57,7 +57,7 @@
 			? contentDisposition.split("filename=")[1]
 			: "CV_File";
 	
-		  // Create a temporary download link and trigger the download
+		  
 		  const blob = await response.blob();
 		  const url = URL.createObjectURL(blob);
 		  const link = document.createElement("a");
@@ -96,7 +96,7 @@
 	
 	onMount(async () => {
 	  const response = await fetch(
-		"https://api.recruitly.io/api/candidate?apiKey=TEST9349C0221517DA4942E39B5DF18C68CDA154"
+		"https://api.recruitly.io/api/candidate?apiKey=apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA"
 	  );
 	  const responseData = await response.json();
 	  jsonData = responseData.data;
@@ -122,7 +122,7 @@
 			{ dataField: "mobile", caption: "Mobile", width: 150 },
 			{
 			  caption: "Actions",
-			  width: 400,
+			  width: 350,
 			  cellTemplate: function (container, options) {
 				const cvUploadButton = document.createElement("button");
 				cvUploadButton.innerText = "CV Upload";
@@ -182,7 +182,7 @@
 			onSaveRowChanges: handleSave, // Bind handleSave function to the saveRowChanges event
 		  },
 		  paging: {
-			pageSize: 20,
+			pageSize: 10,
 		  },
 		  onRowInserting: async (e) => {
         console.log("Data being sent to API:", e.data);
@@ -228,7 +228,7 @@
 
           console.log(newData);
           const response = await fetch(
-            `https://api.recruitly.io/api/candidate?apiKey=TEST9349C0221517DA4942E39B5DF18C68CDA154`,
+            `https://api.recruitly.io/api/candidate?apiKey=apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`,
             {
               method: "POST",
               headers: {
