@@ -26,12 +26,12 @@
           formData.append("cv", file);
 
           const response = await fetch(
-            `https://api.recruitly.io/api/candidatcv//upload?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA&candidateId=hire81f9eb3fa87848dca856c0396874259a`,
-            {
-              method: "POST",
-              body: formData,
-            }
-          );
+            `https://api.recruitly.io/api/candidatcv/${candidateId}/upload?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`,
+             {
+                 method: "POST",
+                 body: formData,
+                              }
+                );
 
           if (response.ok) {
             console.log("CV uploaded successfully");
