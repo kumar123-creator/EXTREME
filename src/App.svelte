@@ -262,15 +262,15 @@
   </div>
 </div>
 {/if}
-{#if isCVViewPopupVisible}
-
+{#if isViewCvPopupVisible}
 <div class="popup-overlay">
-<div class="popup-content">
-  <h3>View CV</h3>
-  <!-- Display the CV content here -->
-  <p>CV content goes here...</p>
-  <button on:click={handleClose} class="btn btn-secondary">close</button>
-</div>
+  <div class="popup-content">
+    <h3>View CV</h3>
+    <iframe src="{selectedCvUrl}" width="100%" height="600px"></iframe>
+    <button class="btn btn-primary" on:click="{() => handleClose()}">
+      Close
+    </button>
+  </div>
 </div>
 {/if}
 
