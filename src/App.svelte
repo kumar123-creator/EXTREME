@@ -115,18 +115,18 @@
 		{
 		  dataSource: gridData,
 		  columns: [
-			{ dataField: "id", caption: "ID", width: 350 },
-			{ dataField: "firstName", caption: "First Name", width: 200 },
-			{ dataField: "surname", caption: "Surname", width: 200 },
-			{ dataField: "email", caption: "Email", width: 200 },
-			{ dataField: "mobile", caption: "Mobile", width: 150 },
+			{ dataField: "id", caption: "ID", width: 250 },
+			{ dataField: "firstName", caption: "First Name", width: 180 },
+			{ dataField: "surname", caption: "Surname", width: 1800 },
+			{ dataField: "email", caption: "Email", width: 180 },
+			{ dataField: "mobile", caption: "Mobile", width: 100 },
 			{
 			  caption: "Actions",
-			  width: 90,
+			  width: 350,
 			  cellTemplate: function (container, options) {
 				const cvUploadButton = document.createElement("button");
 				cvUploadButton.innerText = "CV Upload";
-				cvUploadButton.classList.add("btn", "btn-success", "mr-2");
+				cvUploadButton.classList.add("btn", "btn-primary", "mr-2");
 				cvUploadButton.addEventListener("click", function () {
 				  const rowData = options.data;
 				  selectedRowData = rowData;
