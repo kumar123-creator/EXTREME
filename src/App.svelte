@@ -1,19 +1,30 @@
-<h1 style="color:blue;">Job Candidate Details</h1> 
 <script>
   import { onMount } from "svelte";
   import "bootstrap/dist/css/bootstrap.min.css";
   import DevExpress from "devextreme";
-  
+
   let jsonData = [];
   let gridData = [];
-  
+
+  const fileButtonTemplate = (container, options) => {
+    const button = document.createElement("button");
+    button.className = "btn btn-primary btn-sm";
+    button.innerText = "File";
+    button.addEventListener("click", () => {
+      // Handle file button click event here
+      console.log("File button clicked for row with ID:", options.data.id);
+    });
+
+    container.appendChild(button);
+  };
+
   onMount(async () => {
     const response = await fetch(
       "https://api.recruitly.io/api/candidate?apiKey=TEST9349C0221517DA4942E39B5DF18C68CDA154"
     );
     const responseData = await response.json();
     jsonData = responseData.data;
-  
+
     gridData = jsonData.map((item) => ({
       id: item.id,
       firstName: item.firstName,
@@ -21,17 +32,25 @@
       email: item.email,
       mobile: item.mobile,
     }));
-  
+
+    const columns = [
+      { dataField: "id", caption: "ID", width: 250 },
+      { dataField: "firstName", caption: "Full Name", width: 200 },
+      { dataField: "surname", caption: "Surname", width: 200 },
+      { dataField: "email", caption: "Email", width: 200 },
+      { dataField: "mobile", caption: "Mobile", width: 150 },
+      // Add the file button column
+      {
+        caption: "File",
+        width: 100,
+        cellTemplate: fileButtonTemplate,
+      },
+      // Define other columns as needed
+    ];
+
     const dataGrid = new DevExpress.ui.dxDataGrid(document.getElementById("dataGrid"), {
       dataSource: gridData,
-      columns: [
-        { dataField: "id", caption: "ID", width: 250 },
-        { dataField: "firstName", caption: "Full Name", width: 200 },
-        { dataField: "surname", caption: "Surname", width: 200 },
-        { dataField: "email", caption: "Email", width: 200 },
-        { dataField: "mobile", caption: "Mobile", width: 150 },
-        // Define other columns as needed
-      ],
+      columns: columns,
       showBorders: true,
       filterRow: {
         visible: true,
@@ -71,7 +90,7 @@
               body: JSON.stringify(e.data),
             }
           );
-  
+
           const responseData = await response.json();
           if (response.ok) {
             e.data.firstName = responseData.firstName;
@@ -89,13 +108,18 @@
           console.log(e);
           var newData = {
             id: e.key.id,
-            firstName: e.newData.firstName === undefined ? e.oldData.firstName : e.newData.firstName,
-            surname: e.newData.surname === undefined ? e.oldData.surname : e.newData.surname,
+            firstName:
+              e.newData.firstName === undefined
+                ? e.oldData.firstName
+                : e.newData.firstName,
+            surname:
+              e.newData.surname === undefined ? e.oldData.surname : e.newData.surname,
             email: e.newData.email === undefined ? e.oldData.email : e.newData.email,
-            mobile: e.newData.mobile === undefined ? e.oldData.mobile : e.newData.mobile,
-          }
-  
-          console.log(newData)
+            mobile:
+              e.newData.mobile === undefined ? e.oldData.mobile : e.newData.mobile,
+          };
+
+          console.log(newData);
           const response = await fetch(
             `https://api.recruitly.io/api/candidate?apiKey=TEST9349C0221517DA4942E39B5DF18C68CDA154`,
             {
@@ -142,9 +166,18 @@
         }
       },
       onInitialized: () => {
-  
+        // Existing code...
       },
     });
   });
 </script>
+
+<style>
+  #dataGrid {
+    height: 400px;
+  }
+</style>
+
+<h1 style="color:blue;">Job Candidate Details</h1>
+
 <div id="dataGrid"></div>
