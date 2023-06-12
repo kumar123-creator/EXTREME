@@ -95,7 +95,7 @@
 
 <style>
   #dataGrid {
-    height: 400px;
+    height: 600px;
   }
   
   .popup {
@@ -103,7 +103,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 400px;
+    width: 900px;
     padding: 20px;
     background-color: #fff;
     border: 1px solid #ccc;
