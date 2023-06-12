@@ -27,73 +27,55 @@
       { dataField: "surname", caption: "Surname", width: 200 },
       { dataField: "email", caption: "Email", width: 200 },
       { dataField: "mobile", caption: "Mobile", width: 150 },
+      // Add the file button column
       {
         caption: "Actions",
+        width: 100,
         cellTemplate: function (container, options) {
           const link = document.createElement("a");
           link.href = `https://api.recruitly.io/api/candidatecv/${options.data.id}?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`;
-          link.target = "_blank";
-          link.innerText = "View CV";
-          link.addEventListener("click", async (event) => {
-            event.preventDefault();
-            const cvResponse = await fetch(link.href);
-            if (cvResponse.ok) {
-              const cvData = await cvResponse.json();
-              const cvHtml = cvData.html;
-              if (cvHtml) {
-                const cvWindow = window.open("", "_blank");
-                cvWindow.document.write(cvHtml);
-                cvWindow.document.close();
-              } else {
-                alert("CV file not found.");
-              }
-            } else {
-              alert("Failed to fetch CV file.");
-            }
-          });
+          link.innerHTML = "Download CV";
+          link.download = "CV";
+          link.className = "btn btn-primary";
           container.appendChild(link);
         },
-        width: 150,
       },
-      // Add other columns as needed
+      // Define other columns as needed
     ];
 
-    const dataGrid = new DevExpress.ui.dxDataGrid(
-      document.getElementById("dataGrid"),
-      {
-        dataSource: gridData,
-        columns: columns,
-        showBorders: true,
-        filterRow: {
-          visible: true,
+    const dataGrid = new DevExpress.ui.dxDataGrid(document.getElementById("dataGrid"), {
+      dataSource: gridData,
+      columns: columns,
+      showBorders: true,
+      filterRow: {
+        visible: true,
+      },
+      editing: {
+        allowDeleting: true,
+        allowAdding: true,
+        allowUpdating: true,
+        mode: "popup",
+        form: {
+          labelLocation: "top",
         },
-        editing: {
-          allowDeleting: true,
-          allowAdding: true,
-          allowUpdating: true,
-          mode: "popup",
-          form: {
-            labelLocation: "top",
-          },
-          popup: {
-            showTitle: true,
-            title: "Row in the editing state",
-          },
-          texts: {
-            saveRowChanges: "Save",
-            cancelRowChanges: "Cancel",
-            deleteRow: "Delete",
-            confirmDeleteMessage:
-              "Are you sure you want to delete this record?",
-          },
+        popup: {
+          showTitle: true,
+          title: "Row in the editing state",
         },
-        paging: {
-          pageSize: 10,
+        texts: {
+          saveRowChanges: "Save",
+          cancelRowChanges: "Cancel",
+          deleteRow: "Delete",
+          confirmDeleteMessage: "Are you sure you want to delete this record?",
         },
-
-        onInitialized: () => {},
-      }
-    );
+      },
+      paging: {
+        pageSize: 10,
+      },
+      onInitialized: () => {
+        // Any additional initialization code
+      },
+    });
   });
 </script>
 
