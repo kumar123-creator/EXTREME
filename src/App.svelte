@@ -53,11 +53,6 @@
   isViewCvPopupVisible = true;
 }
 
-viewCVButton.addEventListener("click", function () {
-  const rowData = options.data;
-  const cvUrl = rowData.cvUrl; // Assuming cvUrl is the property containing the CV file URL
-  viewCV(cvUrl);
-});
 
 
 	
@@ -159,14 +154,12 @@ viewCVButton.addEventListener("click", function () {
 				  downloadCV(cvUrl);
 				});
 	
-				const viewCVButton = document.createElement("button");
-				viewCVButton.innerText = "View CV";
-				viewCVButton.classList.add("btn", "btn-secondary");
 				viewCVButton.addEventListener("click", function () {
-				  const rowData = options.data;
-				  // Implement view CV logic here
-				  console.log("View CV clicked for row:", rowData);
-				});
+  const rowData = options.data;
+  const cvUrl = rowData.cvUrl; // Assuming cvUrl is the property containing the CV file URL
+  viewCV(cvUrl);
+});
+
 	
 				container.appendChild(cvUploadButton);
 				container.appendChild(cvDownloadButton);
