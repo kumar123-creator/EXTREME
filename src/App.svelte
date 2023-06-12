@@ -6,9 +6,7 @@
   let jsonData = [];
   let gridData = [];
   let isCVUploadPopupVisible = false;
-  let isViewCvPopupVisible = false;
   let selectedRowData = null;
-  let selectedCvUrl = null;
 
   async function uploadCV(file) {
     // Perform further actions with the uploaded file
@@ -31,7 +29,8 @@
 
         if (response.ok) {
           console.log("CV uploaded successfully");
-          // Perform any additional actions upon successful upload
+          isCVUploadPopupVisible = false; // Close the CV upload popup
+          alert("CV uploaded successfully!"); // Display success message
         } else {
           console.error("CV upload failed.");
           // Handle the error accordingly
@@ -41,6 +40,20 @@
         // Handle the error accordingly
       }
     }
+  }
+
+  function handleSave() {
+    // Perform save logic
+    // In this case, we're updating the backend API URL in the handleSave function
+    console.log("Save clicked");
+
+    // Close the CV upload popup
+    isCVUploadPopupVisible = false;
+  }
+
+  function handleClose() {
+    // Perform close logic
+    console.log("Close clicked");
 
     // Close the CV upload popup
     isCVUploadPopupVisible = false;
@@ -74,24 +87,6 @@
       console.error("CV download error:", error);
       // Handle the error accordingly
     }
-  }
-
-  function handleSave() {
-    // Perform save logic
-    // In this case, we're updating the backend API URL in the handleSave function
-    console.log("Save clicked");
-
-    // Close the CV upload popup
-    isCVUploadPopupVisible = false;
-  }
-
-  function handleClose() {
-    // Perform close logic
-    console.log("Close clicked");
-
-    // Close the CV upload popup
-    isCVUploadPopupVisible = false;
-    isViewCvPopupVisible = false;
   }
 
   const dispatch = createEventDispatcher();
@@ -149,8 +144,8 @@
               viewCVButton.classList.add("btn", "btn-secondary");
               viewCVButton.addEventListener("click", function () {
                 const rowData = options.data;
-                selectedCvUrl = rowData.cvUrl; // Assuming cvUrl is the property containing the CV file URL
-                isViewCvPopupVisible = true;
+                // Implement view CV logic here
+                console.log("View CV clicked for row:", rowData);
               });
 
               container.appendChild(cvUploadButton);
@@ -213,42 +208,31 @@
     <input
       type="file"
       on:change="{(event) => uploadCV(event.target.files[0])}"
+      accept=".pdf,.doc,.docx"
     />
-    <button class="btn btn-primary" on:click="{() => handleClose()}">
-      Close
-    </button>
+    <button class="btn btn-primary" on:click="{handleSave}">Save</button>
+    <button class="btn btn-secondary" on:click="{handleClose}">Close</button>
   </div>
 </div>
 {/if}
 
-{#if isViewCvPopupVisible}
-<div class="popup-overlay">
-  <div class="popup-content">
-    <h3>View CV</h3>
-    <img src="{selectedCvUrl}" alt="CV Image" />
-    <button class="btn btn-primary" on:click="{() => handleClose()}">
-      Close
-    </button>
-  </div>
-</div>
-{/if}
 <style>
   .popup-overlay {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: rgba(0, 0, 0, 0.5);
-	display: flex;
-	justify-content: center;
-	align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
   }
-  
+
   .popup-content {
-	background-color: white;
-	padding: 20px;
-	border-radius: 4px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
   }
-  </style>
-  
+</style>
