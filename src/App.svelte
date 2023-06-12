@@ -45,6 +45,41 @@
     // Close the CV upload popup
     isCVUploadPopupVisible = false;
   }
+  async function viewCV(file) {
+	  try {
+		const response = await fetch(
+		  `https://api.recruitly.io/api/candidatecv/${file}?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
+		);
+  
+		if (response.ok) {
+		  const contentType = response.headers.get("content-type");
+		  if (contentType && contentType.includes("application/json")) {
+			const file = await response.json();
+			console.log("CV data:", file);
+			// Perform further actions with the CV data
+		  } else {
+			console.error("CV view failed. Invalid response format.");
+			// Handle the error accordingly
+		  }
+		} else {
+		  console.error("CV view failed. Status:", response.status);
+		  // Handle the error accordingly
+		}
+	  } catch (error) {
+		console.error("CV view error:", error);
+		// Handle the error accordingly
+	  }
+	}
+  
+	function openCVViewPopup(file) {
+	  // Perform any necessary actions before opening the popup
+  
+	  // Set the visibility of the CV view popup to true
+	  isCVViewPopupVisible = true;
+  
+	  // Fetch the CV data and perform further actions
+	  viewCV(file);
+	}
 
   async function downloadCV(file) {
   try {
@@ -143,17 +178,16 @@
               cvDownloadButton.classList.add("btn", "btn-info", "mr-2");
               cvDownloadButton.addEventListener("click", function () {
                 const rowData = options.data;
-                const cvUrl = rowData.cvUrl; // Assuming cvUrl is the property containing the CV file URL
+                const cvUrl = rowData.file; // Assuming cvUrl is the property containing the CV file URL
                 downloadCV(cvUrl);
               });
               const viewCVButton = document.createElement("button");
-viewCVButton.innerText = "View CV";
-viewCVButton.classList.add("btn", "btn-secondary");
-viewCVButton.addEventListener("click", function () {
-  const rowData = options.data;
-  const cvFileId = rowData.cvUrl.split('/').pop();
-  const cvUrl = `https://api.recruitly.io/api/candidatecv/${cvFileId}?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`;
-  openCVViewPopup(cvUrl);
+				       viewCVButton.innerText = "View CV";
+				       viewCVButton.classList.add("btn", "btn-secondary");
+				       viewCVButton.addEventListener("click", function () {
+				      const rowData = options.data;
+				       const file = rowData.file; // Assuming cvUrl is the property containing the CV file URL
+				      openCVViewPopup(file);
 				  // Implement view CV logic here
 				      console.log("View CV:", rowData);
 				     });
@@ -236,7 +270,7 @@ viewCVButton.addEventListener("click", function () {
 <div class="popup-overlay">
   <div class="popup-content">
     <h3>View CV</h3>
-    <iframe src="{selectedCvUrl}" width="100%" height="600px"></iframe>
+    <iframe src="{selectedfile}" width="100%" height="600px"></iframe>
     <button class="btn btn-primary" on:click="{() => handleClose()}">
       Close
     </button>
@@ -244,17 +278,6 @@ viewCVButton.addEventListener("click", function () {
 </div>
 {/if}
 
-    <button class="btn btn-primary" on:click="{() => handleClose()}">
-      Close
-    </button>
-  </div>
-</div>
-{/if}
-{#if isViewCvPopupVisible}
-<div class="popup-overlay">
-  <div class="popup-content">
-    <h3>View CV</h3>
-    <iframe src="{selectedCvUrl}" width="100%" height="600px"></iframe>
     <button class="btn btn-primary" on:click="{() => handleClose()}">
       Close
     </button>
