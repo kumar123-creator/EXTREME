@@ -6,47 +6,41 @@
 
   let jsonData = [];
   let gridData = [];
-  const fileButtonTemplate = (container, options) => {
-  const button = document.createElement("button");
-  button.className = "btn btn-primary btn-sm";
-  button.innerText = "Upload CV";
+ 
   button.addEventListener("click", () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "application/pdf"; // Adjust the accepted file types if needed
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "application/pdf";
 
-    input.addEventListener("change", async (e) => {
-      const file = e.target.files[0];
-      
-      if (file) {
-        try {
-          const formData = new FormData();
-          formData.append("cv", file);
+  input.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
 
-          const response = await fetch(
-            `https://api.recruitly.io/api/candidatcv/${e.options.data.id}/upload?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`,
-            {
-              method: "POST",
-              body: formData,
-            }
-          );
+    if (file) {
+      try {
+        const formData = new FormData();
+        formData.append("cv", file);
 
-          if (response.ok) {
-            console.log("CV uploaded successfully");
-          } else {
-            console.error("Failed to upload CV");
+        const response = await fetch(
+          `https://api.recruitly.io/api/candidatcv/${options.data.id}/upload?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`,
+          {
+            method: "POST",
+            body: formData,
           }
-        } catch (error) {
-          console.error("Failed to upload CV:", error);
-        }
-      }
-    });
+        );
 
-    input.click();
+        if (response.ok) {
+          console.log("CV uploaded successfully");
+        } else {
+          console.error("Failed to upload CV");
+        }
+      } catch (error) {
+        console.error("Failed to upload CV:", error);
+      }
+    }
   });
 
-  container.appendChild(button);
-};
+  input.click();
+});
 
   onMount(async () => {
     const response = await fetch(
@@ -173,7 +167,7 @@
           console.error("Failed to update record:", error);
         }
       },
-      onRowRemoving: async (e) => {
+        onRowRemoving: async (e) => {
         console.log("Data being sent to API:", e.data);
         try {
           const response = await fetch(
