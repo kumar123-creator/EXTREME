@@ -17,7 +17,7 @@
 
     input.addEventListener("change", async (e) => {
       const file = e.target.files[0];
-      console.log("Data being sent to API:", e.options.data);
+      console.log("Data being sent to API:", e.options.data.id);
       if (file) {
         try {
           const formData = new FormData();
