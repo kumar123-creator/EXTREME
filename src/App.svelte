@@ -6,7 +6,7 @@
   let jsonData = [];
   let gridData = [];
   let showPopup = false;
-  let pdfUrl = "";
+  let cvHtml = "";
 
   onMount(async () => {
     const response = await fetch(
@@ -40,10 +40,14 @@
             event.preventDefault();
             const cvResponse = await fetch(link.href);
             if (cvResponse.ok) {
-              const blob = await cvResponse.blob();
-              const url = URL.createObjectURL(blob);
-              pdfUrl = url;
-              showPopup = true;
+              const cvData = await cvResponse.json();
+              const cvHtmlContent = cvData.html;
+              if (cvHtmlContent) {
+                cvHtml = cvHtmlContent;
+                showPopup = true;
+              } else {
+                alert("CV file not found.");
+              }
             } else {
               alert("Failed to fetch CV file.");
             }
@@ -104,15 +108,15 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 600px;
-    height: 800px;
+    width: 80%;
+    height: 80%;
     background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+    overflow: auto;
   }
-  
+
   .popup-close {
     position: absolute;
     top: 5px;
@@ -127,7 +131,7 @@
 
 {#if showPopup}
   <div class="popup">
-    <div class="popup-close" on:click={() => { showPopup = false; pdfUrl = ""; }}>Close</div>
-    <iframe src="{pdfUrl}" width="100%" height="100%" frameborder="0"></iframe>
+    <div class="popup-close" on:click={() => { showPopup = false; }}>Close</div>
+    <div innerHTML="{cvHtml}"></div>
   </div>
 {/if}
