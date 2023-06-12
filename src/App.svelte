@@ -5,18 +5,48 @@
 
   let jsonData = [];
   let gridData = [];
-
+ 
   const fileButtonTemplate = (container, options) => {
-    const button = document.createElement("button");
-    button.className = "btn btn-primary btn-sm";
-    button.innerText = "CVFile";
-    button.addEventListener("click", () => {
-      // Handle file button click event here
-      console.log("File button clicked for row with ID:", options.data.id);
+  const button = document.createElement("button");
+  button.className = "btn btn-primary btn-sm";
+  button.innerText = "Upload CV";
+  button.addEventListener("click", () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/pdf"; // Adjust the accepted file types if needed
+
+    input.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        try {
+          const formData = new FormData();
+          formData.append("cv", file);
+
+          const response = await fetch(
+            `https://api.recruitly.io/api/candidate/${options.data.id}/cv?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+
+          if (response.ok) {
+            console.log("CV uploaded successfully");
+          } else {
+            console.error("Failed to upload CV");
+          }
+        } catch (error) {
+          console.error("Failed to upload CV:", error);
+        }
+      }
     });
 
-    container.appendChild(button);
-  };
+    input.click();
+  });
+
+  container.appendChild(button);
+};
+
 
   onMount(async () => {
     const response = await fetch(
