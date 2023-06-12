@@ -146,15 +146,18 @@
                 const cvUrl = rowData.cvUrl; // Assuming cvUrl is the property containing the CV file URL
                 downloadCV(cvUrl);
               });
-
               const viewCVButton = document.createElement("button");
-viewCVButton.innerText = "View CV";
-viewCVButton.classList.add("btn", "btn-secondary");
-viewCVButton.addEventListener("click", function () {
-  const rowData = options.data;
-  const cvUrl = rowData.cvUrl; // Assuming cvUrl is the property containing the CV file URL
-  downloadCV(cvUrl);
-});
+				       viewCVButton.innerText = "View CV";
+				       viewCVButton.classList.add("btn", "btn-secondary");
+				       viewCVButton.addEventListener("click", function () {
+				      const rowData = options.data;
+				       const cvUrl = rowData.cvUrl; // Assuming cvUrl is the property containing the CV file URL
+				      openCVViewPopup(cvUrl);
+				  // Implement view CV logic here
+				      console.log("View CV:", rowData);
+				     });
+  
+   
 
 
               container.appendChild(cvUploadButton);
