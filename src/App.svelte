@@ -18,7 +18,7 @@
 
     input.addEventListener("change", async (e) => {
       const file = e.target.files[0];
-      console.log("Data being sent to API:", options.data);
+      
       if (file) {
 
         try {
