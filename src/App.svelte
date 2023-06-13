@@ -22,7 +22,7 @@
 
       try {
         const response = await fetch(
-          `https://api.recruitly.io/api/candidatecv/upload?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA&candidateId=${uploadCandidateId}`,
+          `https://api.recruitly.io/api/cloudfile/download?cloudFileId=b12d3423-5541-49a6-b3a1-8ed273e50f53&apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77`,
           {
             method: "POST",
             body: formData,
