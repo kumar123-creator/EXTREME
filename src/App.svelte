@@ -37,7 +37,7 @@
           downloadButton.className = "btn btn-success btn-sm";
           downloadButton.textContent = "Download";
           downloadButton.addEventListener("click", () => {
-            downloadCV(options.data.CVId); // Use fileId instead of cvid
+            downloadCV(options.data.CVId); // Use CVId instead of cvid
           });
           container.appendChild(downloadButton);
         },
@@ -59,7 +59,7 @@
     });
   });
 
-  async function downloadCV(fileId) {
+  async function downloadCV(CVId) {
     console.log("Data being sent to API:", CVId);
     try {
       const response = await fetch(
