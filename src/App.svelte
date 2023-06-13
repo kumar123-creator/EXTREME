@@ -1,16 +1,126 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount, createEventDispatcher } from "svelte";
   import "bootstrap/dist/css/bootstrap.min.css";
   import DevExpress from "devextreme";
 
   let jsonData = [];
   let gridData = [];
-  let showPopup = false;
-  let pdfUrl = "";
+  let isCVUploadPopupVisible = false;
+  let isViewCvPopupVisible = false;
+  let selectedRowData = null;
+  let selectedCvUrl = null;
+
+  async function uploadCV(file) {
+    // Perform further actions with the uploaded file
+
+    // Example: Update the backend API URL with the file upload
+    const formData = new FormData();
+    formData.append("file", file);
+
+    if (selectedRowData) {
+      const uploadCandidateId = selectedRowData.id; // Get the candidate ID from selectedRowData
+
+      try {
+        const response = await fetch(
+          `https://api.recruitly.io/api/candidatecv/upload?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA&candidateId=${uploadCandidateId}`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (response.ok) {
+          console.log("CV uploaded successfully");
+          // Perform any additional actions upon successful upload
+        } else {
+          console.error("CV upload failed.");
+          // Handle the error accordingly
+        }
+      } catch (error) {
+        console.error("CV upload error:", error);
+        // Handle the error accordingly
+      }
+    }
+
+    // Close the CV upload popup
+    isCVUploadPopupVisible = false;
+  }
+
+  async function viewCV(candidateId) {
+    const cvUrl = `https://api.recruitly.io/api/cloudfile/download?cloudFileId=b12d3423-5541-49a6-b3a1-8ed273e50f53&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`;
+
+    try {
+      const response = await fetch(cvUrl);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        selectedCvUrl = url; // Set the selectedCvUrl to the object URL of the file
+        isViewCvPopupVisible = true; // Show the view CV popup
+      } else {
+        console.error("CV fetch failed.");
+        // Handle the error accordingly
+      }
+    } catch (error) {
+      console.error("CV fetch error:", error);
+      // Handle the error accordingly
+    }
+  }
+
+  function handleSave() {
+    // Perform save logic
+    // In this case, we're updating the backend API URL in the handleSave function
+    console.log("Save clicked");
+
+    // Close the CV upload popup
+    isCVUploadPopupVisible = false;
+  }
+
+  function handleClose() {
+    // Perform close logic
+    console.log("Close clicked");
+
+    // Close the CV upload popup
+    isCVUploadPopupVisible = false;
+    isViewCvPopupVisible = false;
+  }
+  async function downloadCV(cvUrl) {
+  try {
+    const response = await fetch(
+      `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${cvUrl}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
+    );
+
+    if (response.ok) {
+      // Extract the file name from the response headers
+      const contentDisposition = response.headers.get("content-disposition");
+      const fileName = contentDisposition
+        ? contentDisposition.split("filename=")[1]
+        : "CV_File";
+
+      // Create a temporary download link and trigger the download
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      link.click();
+
+      // Show success message
+      alert("CV downloaded successfully!");
+    } else {
+      console.error("CV download failed.");
+      // Handle the error accordingly
+    }
+  } catch (error) {
+    console.error("CV download error:", error);
+    // Handle the error accordingly
+  }
+}
+
+  const dispatch = createEventDispatcher();
 
   onMount(async () => {
     const response = await fetch(
-      "https://api.recruitly.io/api/candidate?apiKey=TEST9349C0221517DA4942E39B5DF18C68CDA154"
+      "https://api.recruitly.io/api/candidate?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA"
     );
     const responseData = await response.json();
     jsonData = responseData.data;
@@ -21,117 +131,89 @@
       surname: item.surname,
       email: item.email,
       mobile: item.mobile,
+      cvUrl: item.cvUrl, // assuming cvUrl is the property containing the CV file URL
     }));
-
-    const columns = [
-      { dataField: "id", caption: "ID", width: 250 },
-      { dataField: "firstName", caption: "Full Name", width: 200 },
-      { dataField: "surname", caption: "Surname", width: 200 },
-      { dataField: "email", caption: "Email", width: 200 },
-      { dataField: "mobile", caption: "Mobile", width: 155 },
-      {
-        caption: "Actions",
-        cellTemplate: function (container, options) {
-          const link = document.createElement("a");
-          link.href = `https://api.recruitly.io/api/candidatecv/${options.data.id}?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`;
-          link.target = "_blank";
-          link.innerText = "View CV";
-          link.addEventListener("click", async (event) => {
-            event.preventDefault();
-            const cvResponse = await fetch(link.href);
-            if (cvResponse.ok) {
-              const cvBlob = await cvResponse.blob();
-              const reader = new FileReader();
-              reader.onloadend = function () {
-                const base64data = reader.result;
-                pdfUrl = base64data;
-                showPopup = true;
-              };
-              reader.readAsDataURL(cvBlob);
-            } else {
-              alert("Failed to fetch CV file.");
-            }
-          });
-          container.appendChild(link);
-        },
-        width: 150,
-      },
-      // Add other columns as needed
-    ];
 
     const dataGrid = new DevExpress.ui.dxDataGrid(
       document.getElementById("dataGrid"),
       {
         dataSource: gridData,
-        columns: columns,
-        showBorders: true,
-        filterRow: {
-          visible: true,
-        },
-        editing: {
-          allowDeleting: true,
-          allowAdding: true,
-          allowUpdating: true,
-          mode: "popup",
-          form: {
-            labelLocation: "top",
+        columns: [
+          { dataField: "firstName", caption: "First Name" },
+          { dataField: "surname", caption: "Surname" },
+          { dataField: "email", caption: "Email" },
+          { dataField: "mobile", caption: "Mobile" },
+          {
+            dataField: "cvUrl",
+            caption: "CV",
+            cellTemplate: function (container, options) {
+              const button = document.createElement("button");
+              button.className = "btn btn-secondary";
+              button.innerText = "View";
+              button.addEventListener("click", function () {
+                selectedRowData = options.data; // Store the selected row data
+                const candidateId = options.data.id; // Assuming 'id' is the candidate ID property
+                viewCV(candidateId);
+              });
+              container.appendChild(button);
+            },
           },
-          popup: {
-            showTitle: true,
-            title: "Row in the editing state",
-          },
-          texts: {
-            saveRowChanges: "Save",
-            cancelRowChanges: "Cancel",
-            deleteRow: "Delete",
-            confirmDeleteMessage:
-              "Are you sure you want to delete this record?",
-          },
-        },
-        paging: {
-          pageSize: 10,
-        },
-
-        onInitialized: () => {},
+        ],
       }
     );
   });
 </script>
 
 <style>
-  #dataGrid {
-    height: 400px;
-  }
-  
-  .popup {
+  .popup-overlay {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px;
-    height: 800px;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
   }
-  
-  .popup-close {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    cursor: pointer;
+
+  .popup-content {
+    background-color: white;
+    padding: 20px;
+    max-width: 80%;
+    max-height: 80%;
+    overflow: auto;
   }
 </style>
 
-<h1 style="color:blue;">Job Candidate Details</h1>
+<h1>Candidate CVs</h1>
 
 <div id="dataGrid"></div>
 
-{#if showPopup}
-  <div class="popup">
-    <div class="popup-close" on:click={() => { showPopup = false; pdfUrl = ""; }}>Close</div>
-    <iframe src="{pdfUrl}" width="100%" height="100%" frameborder="0"></iframe>
+{#if isCVUploadPopupVisible}
+<div class="popup-overlay">
+  <div class="popup-content">
+    <h3>Upload CV</h3>
+    <input type="file" accept=".pdf" on:change="{(e) => uploadCV(e.target.files[0])}" />
+    <button class="btn btn-primary" on:click="{() => handleSave()}">
+      Save
+    </button>
+    <button class="btn btn-secondary" on:click="{() => handleClose()}">
+      Close
+    </button>
   </div>
+</div>
+{/if}
+
+{#if isViewCvPopupVisible}
+<div class="popup-overlay">
+  <div class="popup-content">
+    <h3>View CV</h3>
+    <iframe src="{selectedCvUrl}" width="100%" height="600px"></iframe>
+    <button class="btn btn-primary" on:click="{() => handleClose()}">
+      Close
+    </button>
+  </div>
+</div>
 {/if}
