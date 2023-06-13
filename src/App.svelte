@@ -152,8 +152,8 @@
               button.innerText = "download";
               button.addEventListener("click", function () {
                 selectedRowData = options.data; // Store the selected row data
-                const candidateId = options.data.id; // Assuming 'id' is the candidate ID property
-                downloadCV(candidateId);
+                const CVid = options.data.id; // Assuming 'id' is the candidate ID property
+                downloadCV(CVid);
               });
               container.appendChild(button);
             },
