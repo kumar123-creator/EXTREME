@@ -99,12 +99,25 @@
       // Create a temporary download link and trigger the download
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
+
+      // Create a link element
       const link = document.createElement("a");
       link.href = url;
-      link.download = "CV.pdf";
-      link.click();
+      link.download = fileName; // Set the download attribute to the file name
+      link.target = "_blank"; // Open the file in a new tab if needed
 
-      // Show success message
+      // Simulate a click event to trigger the download
+      const clickEvent = new MouseEvent("click", {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+      });
+      link.dispatchEvent(clickEvent);
+
+      // Clean up the object URL after the download
+      URL.revokeObjectURL(url);
+
+      // Show a success message
       alert("CV downloaded successfully!");
     } else {
       console.error("CV download failed.");
@@ -115,6 +128,7 @@
     // Handle the error accordingly
   }
 }
+
 
   const dispatch = createEventDispatcher();
 
