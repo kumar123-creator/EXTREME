@@ -144,16 +144,16 @@
           { dataField: "email", caption: "Email" },
           { dataField: "mobile", caption: "Mobile" },
           {
-            dataField: "cvUrl",
+            dataField: "cvid",
             caption: "CV",
             cellTemplate: function (container, options) {
               const button = document.createElement("button");
               button.className = "btn btn-secondary";
-              button.innerText = "View";
+              button.innerText = "download";
               button.addEventListener("click", function () {
                 selectedRowData = options.data; // Store the selected row data
                 const candidateId = options.data.id; // Assuming 'id' is the candidate ID property
-                viewCV(candidateId);
+                downloadCV(candidateId);
               });
               container.appendChild(button);
             },
