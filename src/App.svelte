@@ -83,10 +83,10 @@
     isCVUploadPopupVisible = false;
     isViewCvPopupVisible = false;
   }
-  async function downloadCV(cvUrl) {
+  async function downloadCV(cvid) {
   try {
     const response = await fetch(
-      `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${cvUrl}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
+      `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${cvid}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
     );
 
     if (response.ok) {
@@ -131,7 +131,7 @@
       surname: item.surname,
       email: item.email,
       mobile: item.mobile,
-      cvUrl: item.cvUrl, // assuming cvUrl is the property containing the CV file URL
+      cvid: item.cvid, // assuming cvUrl is the property containing the CV file URL
     }));
 
     const dataGrid = new DevExpress.ui.dxDataGrid(
@@ -144,16 +144,16 @@
           { dataField: "email", caption: "Email" },
           { dataField: "mobile", caption: "Mobile" },
           {
-            dataField: "cvUrl",
+            dataField: "cvid",
             caption: "CV",
             cellTemplate: function (container, options) {
               const button = document.createElement("button");
               button.className = "btn btn-secondary";
-              button.innerText = "View";
+              button.innerText = "download";
               button.addEventListener("click", function () {
                 selectedRowData = options.data; // Store the selected row data
                 const candidateId = options.data.id; // Assuming 'id' is the candidate ID property
-                viewCV(candidateId);
+                downloadCV(candidateId);
               });
               container.appendChild(button);
             },
