@@ -99,25 +99,12 @@
       // Create a temporary download link and trigger the download
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
-
-      // Create a link element
       const link = document.createElement("a");
       link.href = url;
-      link.download = fileName; // Set the download attribute to the file name
-      link.target = "_blank"; // Open the file in a new tab if needed
+      link.download = fileName;
+      link.click();
 
-      // Simulate a click event to trigger the download
-      const clickEvent = new MouseEvent("click", {
-        view: window,
-        bubbles: true,
-        cancelable: true,
-      });
-      link.dispatchEvent(clickEvent);
-
-      // Clean up the object URL after the download
-      URL.revokeObjectURL(url);
-
-      // Show a success message
+      // Show success message
       alert("CV downloaded successfully!");
     } else {
       console.error("CV download failed.");
@@ -128,7 +115,6 @@
     // Handle the error accordingly
   }
 }
-
 
   const dispatch = createEventDispatcher();
 
@@ -167,7 +153,7 @@
               button.addEventListener("click", function () {
                 selectedRowData = options.data; // Store the selected row data
                 const candidateId = options.data.id; // Assuming 'id' is the candidate ID property
-                downloadCV(candidateId);
+                viewCV(candidateId);
               });
               container.appendChild(button);
             },
