@@ -153,7 +153,7 @@
               button.addEventListener("click", function () {
                 selectedRowData = options.data; // Store the selected row data
                 const candidateId = options.data.id; // Assuming 'id' is the candidate ID property
-                viewCV(candidateId);
+                downloadCV(candidateId);
               });
               container.appendChild(button);
             },
