@@ -83,10 +83,10 @@
     isCVUploadPopupVisible = false;
     isViewCvPopupVisible = false;
   }
-  async function downloadCV(cvid) {
+  async function downloadCV(cvUrl) {
   try {
     const response = await fetch(
-      `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${cvid}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
+      `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${cvUrl}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
     );
 
     if (response.ok) {
@@ -144,16 +144,16 @@
           { dataField: "email", caption: "Email" },
           { dataField: "mobile", caption: "Mobile" },
           {
-            dataField: "cvid",
+            dataField: "cvUrl",
             caption: "CV",
             cellTemplate: function (container, options) {
               const button = document.createElement("button");
               button.className = "btn btn-secondary";
-              button.innerText = "download";
+              button.innerText = "View";
               button.addEventListener("click", function () {
                 selectedRowData = options.data; // Store the selected row data
                 const candidateId = options.data.id; // Assuming 'id' is the candidate ID property
-                downloadCV(candidateId);
+                viewCV(candidateId);
               });
               container.appendChild(button);
             },
