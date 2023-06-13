@@ -40,14 +40,14 @@
             event.preventDefault();
             const cvResponse = await fetch(link.href);
             if (cvResponse.ok) {
-              const blob = await cvResponse.blob();
+              const cvBlob = await cvResponse.blob();
               const reader = new FileReader();
               reader.onloadend = function () {
                 const base64data = reader.result;
                 pdfUrl = base64data;
                 showPopup = true;
               };
-              reader.readAsDataURL(blob);
+              reader.readAsDataURL(cvBlob);
             } else {
               alert("Failed to fetch CV file.");
             }
