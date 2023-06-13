@@ -22,7 +22,7 @@
 
       try {
         const response = await fetch(
-          `https://api.recruitly.io/api/cloudfile/download?cloudFileId=b12d3423-5541-49a6-b3a1-8ed273e50f53&apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77`,
+          `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${selectedCVId}&apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77`,
           {
             method: "POST",
             body: formData,
@@ -45,12 +45,13 @@
     // Close the CV upload popup
     isCVUploadPopupVisible = false;
   }
- async function downloadCV(CVId) {
+
+  async function downloadCV(CVId) {
     console.log("cvid:", CVId);
     try {
       const response = await fetch(
-                      'window.location.href = https://api.recruitly.io/api/cloudfile/download?cloudFileId=${CVId}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA'
-                                 );
+        `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${CVId}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
+      );
 
       if (response.ok) {
         const blob = await response.blob();
@@ -124,6 +125,7 @@
               cvUploadButton.addEventListener("click", function () {
                 const rowData = options.data;
                 selectedRowData = rowData;
+                selectedCVId = rowData.cvId; // Assuming cvId is the property containing the CV file ID
                 isCVUploadPopupVisible = true;
               });
 
@@ -141,7 +143,7 @@
               viewCVButton.classList.add("btn", "btn-secondary");
               viewCVButton.addEventListener("click", function () {
                 const rowData = options.data;
-                selectedCvId = rowData.cvId; // Assuming cvId is the property containing the CV file ID
+                selectedCVId = rowData.cvId; // Assuming cvId is the property containing the CV file ID
                 isViewCvPopupVisible = true;
               });
 
@@ -171,7 +173,8 @@
             saveRowChanges: "Save",
             cancelRowChanges: "Cancel",
             deleteRow: "Delete",
-            confirmDeleteMessage: "Are you sure you want to delete this record?",
+            confirmDeleteMessage:
+              "Are you sure you want to delete this record?",
           },
           onSaveRowChanges: handleSave, // Bind handleSave function to the saveRowChanges event
         },
@@ -220,7 +223,7 @@
     <div class="popup-overlay">
       <div class="popup-content">
         <h3>View CV</h3>
-        <iframe src="{selectedCvUrl}" width="100%" height="600px"></iframe>
+        <iframe src="https://api.recruitly.io/api/cloudfile/download?cloudFileId={selectedCVId}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA" width="100%" height="600px"></iframe>
         <button class="btn btn-primary" on:click="{() => handleClose()}">
           Close
         </button>
