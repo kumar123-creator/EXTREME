@@ -9,6 +9,7 @@
   let isViewCvPopupVisible = false;
   let selectedRowData = null;
   let selectedCVId = null;
+  let selectedCVFileName = null;
 
   async function uploadCV(file) {
     // Perform further actions with the uploaded file
@@ -46,8 +47,7 @@
     isCVUploadPopupVisible = false;
   }
 
-  async function downloadCV(CVId) {
-    console.log("cvid:", CVId);
+  async function downloadCV(CVId, fileName) {
     try {
       const response = await fetch(
         `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${CVId}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
@@ -58,7 +58,7 @@
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = "CV.pdf"; // Replace with the desired file name
+        link.download = fileName; // Use the provided file name
         link.click();
         URL.revokeObjectURL(url);
       } else {
@@ -103,6 +103,7 @@
       email: item.email,
       mobile: item.mobile,
       cvId: item.cvId, // assuming cvId is the property containing the CV file ID
+      cvFileName: item.cvFileName, // assuming cvFileName is the property containing the CV file name
     }));
 
     const dataGrid = new DevExpress.ui.dxDataGrid(
@@ -135,7 +136,8 @@
               cvDownloadButton.addEventListener("click", function () {
                 const rowData = options.data;
                 const cvId = rowData.cvId; // Assuming cvId is the property containing the CV file ID
-                downloadCV(cvId);
+                const fileName = rowData.cvFileName; // Assuming cvFileName is the property containing the CV file name
+                downloadCV(cvId, fileName);
               });
 
               const viewCVButton = document.createElement("button");
@@ -219,18 +221,7 @@
 <div class="popup-overlay">
   <div class="popup-content">
     <h3>View CV</h3>
-    {#if isViewCvPopupVisible}
-    <div class="popup-overlay">
-      <div class="popup-content">
-        <h3>View CV</h3>
-        <iframe src="https://api.recruitly.io/api/cloudfile/download?cloudFileId={selectedCVId}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA" width="100%" height="600px"></iframe>
-        <button class="btn btn-primary" on:click="{() => handleClose()}">
-          Close
-        </button>
-      </div>
-    </div>
-    {/if}
-
+    <iframe src="https://api.recruitly.io/api/cloudfile/download?cloudFileId={selectedCVId}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA" width="100%" height="600px"></iframe>
     <button class="btn btn-primary" on:click="{() => handleClose()}">
       Close
     </button>
