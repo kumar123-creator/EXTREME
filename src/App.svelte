@@ -46,7 +46,7 @@
     isCVUploadPopupVisible = false;
   }
  async function downloadCV(CVId) {
-    console.log("Data being sent to API:", CVId);
+    console.log("cvid:", CVId);
     try {
       const response = await fetch(
                       'window.location.href = https://api.recruitly.io/api/cloudfile/download?cloudFileId=${CVId}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA'
