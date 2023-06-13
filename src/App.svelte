@@ -47,27 +47,28 @@
     isCVUploadPopupVisible = false;
   }
 
-  async function downloadCV(CVId, fileName) {
-    try {
-      const response = await fetch(
-        `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${CVId}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
-      );
+  async function downloadCV(cvId, cvFileName) {
+  console.log("cvid:", cvId);
+  try {
+    const response = await fetch(
+      `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${cvId}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
+    );
 
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = fileName; // Use the provided file name
-        link.click();
-        URL.revokeObjectURL(url);
-      } else {
-        console.error("Failed to download CV.");
-      }
-    } catch (error) {
-      console.error("Error while downloading CV:", error);
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = cvFileName; // Use the provided CV file name
+      link.click();
+      URL.revokeObjectURL(url);
+    } else {
+      console.error("Failed to download CV.");
     }
+  } catch (error) {
+    console.error("Error while downloading CV:", error);
   }
+}
 
   function handleSave() {
     // Perform save logic
@@ -144,9 +145,10 @@
               viewCVButton.innerText = "View CV";
               viewCVButton.classList.add("btn", "btn-secondary");
               viewCVButton.addEventListener("click", function () {
-                const rowData = options.data;
-                selectedCVId = rowData.cvId; // Assuming cvId is the property containing the CV file ID
-                isViewCvPopupVisible = true;
+              const rowData = options.data;
+              selectedCVId = rowData.cvId; // Assuming cvId is the property containing the CV file ID
+              const cvFileName = rowData.cvFileName; // Assuming cvFileName is the property containing the CV file name
+              downloadCV(selectedCVId, cvFileName); // Pass the CV ID and file name to the download function
               });
 
               container.appendChild(cvUploadButton);
