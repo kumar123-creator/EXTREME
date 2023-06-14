@@ -47,7 +47,7 @@
     isCVUploadPopupVisible = false;
   }
 
-  async function downloadCV(cvId, cvFileName) {
+async function downloadCV(cvId, cvFileName) {
   console.log("cvid:", cvId);
   try {
     const response = await fetch(
@@ -60,7 +60,10 @@
       const link = document.createElement("a");
       link.href = url;
       link.download = cvFileName; // Use the provided CV file name
+      link.target = "_blank"; // Open the file in a new tab/window
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } else {
       console.error("Failed to download CV.");
