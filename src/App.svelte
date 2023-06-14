@@ -218,17 +218,6 @@
   </div>
 </div>
 {/if}
-{#if isViewCvPopupVisible}
-<div class="popup-overlay">
-  <div class="popup-content">
-    <h3>View CV</h3>
-    <iframe src="https://api.recruitly.io/api/cloudfile/download?cloudFileId={selectedCVId}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA" width="100%" height="600px"></iframe>
-    <button class="btn btn-primary" on:click="{() => handleClose()}">
-      Close
-    </button>
-  </div>
-</div>
-{/if}
 
 <style>
   .popup-overlay {
