@@ -23,7 +23,7 @@
 
       try {
         const response = await fetch(
-          `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${selectedCVId}&apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77`,
+          `https://api.recruitly.io/api/cloudfile/upload?candidateId=${uploadCandidateId}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`,
           {
             method: "POST",
             body: formData,
@@ -48,43 +48,25 @@
   }
 
   async function downloadCV(cvId, cvFileName) {
-  console.log("cvid:", cvId);
-  try {
-    const response = await fetch(
-      `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${cvId}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
-    );
+    try {
+      const response = await fetch(
+        `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${cvId}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
+      );
 
-    if (response.ok) {
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-
-      // Create a temporary link element to initiate the download
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = cvFileName; // Use the provided CV file name
-      link.style.display = "none";
-      document.body.appendChild(link);
-
-      link.click();
-
-      // Clean up the temporary link element
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } else {
-      console.error("Failed to download CV.");
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = cvFileName; // Use the provided CV file name
+        link.click();
+        URL.revokeObjectURL(url);
+      } else {
+        console.error("Failed to download CV.");
+      }
+    } catch (error) {
+      console.error("Error while downloading CV:", error);
     }
-  } catch (error) {
-    console.error("Error while downloading CV:", error);
-  }
-}
-
-  function handleSave() {
-    // Perform save logic
-    // In this case, we're updating the backend API URL in the handleSave function
-    console.log("Save clicked");
-
-    // Close the CV upload popup
-    isCVUploadPopupVisible = false;
   }
 
   function handleClose() {
@@ -115,149 +97,133 @@
       cvFileName: item.cvFileName, // assuming cvFileName is the property containing the CV file name
     }));
 
-    const dataGrid = new DevExpress.ui.dxDataGrid(document.getElementById("dataGrid"), {
-      dataSource: gridData,
-      columns: [
-        { dataField: "id", caption: "ID", width: 250 },
-        { dataField: "firstName", caption: "First Name", width: 180 },
-        { dataField: "surname", caption: "Surname", width: 180 },
-        { dataField: "email", caption: "Email", width: 180 },
-        { dataField: "mobile", caption: "Mobile", width: 100 },
-        {
-          caption: "Actions",
-          width: 350,
-          cellTemplate: function (container, options) {
-            const cvUploadButton = document.createElement("button");
-            cvUploadButton.innerText = "CV Upload";
-            cvUploadButton.classList.add("btn", "btn-primary", "mr-2");
-            cvUploadButton.addEventListener("click", function () {
-              const rowData = options.data;
-              selectedRowData = rowData;
-              selectedCVId = rowData.cvId; // Assuming cvId is the property containing the CV file ID
-              isCVUploadPopupVisible = true;
-            });
+    const dataGrid = new DevExpress.ui.dxDataGrid(
+      document.getElementById("dataGrid"),
+      {
+        dataSource: gridData,
+        columns: [
+          { dataField: "id", caption: "ID", width: 250 },
+          { dataField: "firstName", caption: "First Name", width: 180 },
+          { dataField: "surname", caption: "Surname", width: 180 },
+          { dataField: "email", caption: "Email", width: 180 },
+          { dataField: "mobile", caption: "Mobile", width: 100 },
+          {
+            caption: "Actions",
+            width: 350,
+            cellTemplate: function (container, options) {
+              const cvUploadButton = document.createElement("button");
+              cvUploadButton.innerText = "CV Upload";
+              cvUploadButton.classList.add("btn", "btn-primary", "mr-2");
+              cvUploadButton.addEventListener("click", function () {
+                const rowData = options.data;
+                selectedRowData = rowData;
+                selectedCVId = rowData.cvId; // Assuming cvId is the property containing the CV file ID
+                isCVUploadPopupVisible = true;
+              });
 
-            const cvDownloadButton = document.createElement("button");
-            cvDownloadButton.innerText = "CV Download";
-            cvDownloadButton.classList.add("btn", "btn-info", "mr-2");
-            cvDownloadButton.addEventListener("click", function () {
-              const rowData = options.data;
-              const cvId = rowData.cvId; // Assuming cvId is the property containing the CV file ID
-              const fileName = rowData.cvFileName; // Assuming cvFileName is the property containing the CV file name
-              downloadCV(cvId, fileName);
-            });
+              const cvDownloadButton = document.createElement("button");
+              cvDownloadButton.innerText = "CV Download";
+              cvDownloadButton.classList.add("btn", "btn-info", "mr-2");
+              cvDownloadButton.addEventListener("click", function () {
+                const rowData = options.data;
+                const cvId = rowData.cvId; // Assuming cvId is the property containing the CV file ID
+                const fileName = rowData.cvFileName; // Assuming cvFileName is the property containing the CV file name
+                downloadCV(cvId, fileName);
+              });
 
-            const viewCVButton = document.createElement("button");
-            viewCVButton.innerText = "View CV";
-            viewCVButton.classList.add("btn", "btn-secondary");
-            viewCVButton.addEventListener("click", function () {
-              const rowData = options.data;
-              selectedCVId = rowData.cvId; // Assuming cvId is the property containing the CV file ID
-              const cvFileName = rowData.cvFileName; // Assuming cvFileName is the property containing the CV file name
-              isViewCvPopupVisible = true;
-            });
+              const viewCVButton = document.createElement("button");
+              viewCVButton.innerText = "View CV";
+              viewCVButton.classList.add("btn", "btn-secondary");
+              viewCVButton.addEventListener("click", function () {
+                const rowData = options.data;
+                selectedCVId = rowData.cvId; // Assuming cvId is the property containing the CV file ID
+                selectedCVFileName = rowData.cvFileName; // Assuming cvFileName is the property containing the CV file name
+                isViewCvPopupVisible = true;
+              });
 
-            container.appendChild(cvUploadButton);
-            container.appendChild(cvDownloadButton);
-            container.appendChild(viewCVButton);
+              container.appendChild(cvUploadButton);
+              container.appendChild(cvDownloadButton);
+              container.appendChild(viewCVButton);
+            },
           },
+        ],
+        showBorders: true,
+        filterRow: {
+          visible: true,
         },
-      ],
-      showBorders: true,
-      filterRow: {
-        visible: true,
-      },
-      editing: {
-        allowDeleting: true,
-        allowAdding: true,
-        allowUpdating: true,
-        mode: "popup",
-        form: {
-          labelLocation: "top",
+        paging: {
+          pageSize: 10,
         },
-        popup: {
-          showTitle: true,
-          title: "Row in the editing state",
+        onRowInserting: async (e) => {
+          // ...
         },
-        texts: {
-          saveRowChanges: "Save",
-          cancelRowChanges: "Cancel",
-          deleteRow: "Delete",
-          confirmDeleteMessage: "Are you sure you want to delete this record?",
+        onRowUpdating: async (e) => {
+          // ...
         },
-        onSaveRowChanges: handleSave, // Bind handleSave function to the saveRowChanges event
-      },
-      paging: {
-        pageSize: 10,
-      },
-      onRowInserting: async (e) => {
-        // ...
-      },
-      onRowUpdating: async (e) => {
-        // ...
-      },
-      onRowRemoving: async (e) => {
-        // ...
-      },
-      onInitialized: () => {
-        // Function called when the grid is initialized
-        // ...
-      },
-    });
+        onRowRemoving: async (e) => {
+          // ...
+        },
+        onInitialized: () => {
+          // Function called when the grid is initialized
+          // ...
+        },
+      }
+    );
   });
 </script>
 
 <div id="dataGrid"></div>
 
 {#if isCVUploadPopupVisible}
-<div class="popup-overlay">
-  <div class="popup-content">
-    <h3>Upload CV</h3>
-    <input type="file" on:change="{(event) => uploadCV(event.target.files[0])}" />
-    <button class="btn btn-primary" on:click="{() => handleClose()}">Close</button>
+  <div class="popup-overlay">
+    <div class="popup-content">
+      <h3>Upload CV</h3>
+      <input type="file" on:change="{(event) => uploadCV(event.target.files[0])}" />
+      <button class="btn btn-primary" on:click="{() => handleClose()}">Close</button>
+    </div>
   </div>
-</div>
 {/if}
+
 {#if isViewCvPopupVisible}
-<div class="popup-overlay">
-  <div class="popup-content">
-    <h3>View CV</h3>
-    <iframe src={`https://api.recruitly.io/api/cloudfile/download?cloudFileId=${selectedCVId}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`} width="100%" height="600px"></iframe>
-    <button class="btn btn-primary" on:click="{() => handleClose()}">Close</button>
+  <div class="popup-overlay">
+    <div class="popup-content">
+      <h3>View CV</h3>
+      <iframe src="https://api.recruitly.io/api/cloudfile/download?cloudFileId={selectedCVId}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA" width="100%" height="600px"></iframe>
+      <button class="btn btn-primary" on:click="{() => handleClose()}">Close</button>
+    </div>
   </div>
-</div>
 {/if}
 
 <style>
-.popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-.popup-content {
-  background-color: white;
-  padding: 20px;
-  border-radius: 4px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  width: 400px;
-}
+  .popup-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    width: 400px;
+  }
 
-.popup-content h3 {
-  margin-top: 0;
-}
+  .popup-content h3 {
+    margin-top: 0;
+  }
 
-.btn {
-  margin-top: 10px;
-}
+  .btn {
+    margin-top: 10px;
+  }
 
-#dataGrid {
-  margin-top: 20px;
-}
+  #dataGrid {
+    margin-top: 20px;
+  }
 </style>
