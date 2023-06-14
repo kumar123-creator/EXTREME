@@ -152,11 +152,20 @@
               alert("Failed to fetch .");
             }
           });
+          container.appendChild(viewButton);
+        },
+        width: 250,
+      },
+      // Add other columns as needed
+    ];
 
-            container.appendChild(viewCVButton);
-            },
-          },
-        ],
+ 
+
+    const dataGrid = new DevExpress.ui.dxDataGrid(
+      document.getElementById("dataGrid"),
+      {
+        dataSource: gridData,
+        columns: columns,
         showBorders: true,
         filterRow: {
           visible: true,
@@ -180,24 +189,14 @@
             confirmDeleteMessage:
               "Are you sure you want to delete this record?",
           },
-          onSaveRowChanges: handleSave, // Bind handleSave function to the saveRowChanges event
         },
         paging: {
           pageSize: 10,
         },
-        onRowInserting: async (e) => {
-          // ...
-        },
-        onRowUpdating: async (e) => {
-          // ...
-        },
-        onRowRemoving: async (e) => {
-          // ...
-        },
-        onInitialized: () => {
-          // Function called when the grid is initialized
-          // ...
-        },
+
+ 
+
+        onInitialized: () => {},
       }
     );
   });
