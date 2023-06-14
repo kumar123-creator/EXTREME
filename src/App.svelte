@@ -47,31 +47,29 @@
     isCVUploadPopupVisible = false;
   }
 
-async function downloadCV(cvId, cvFileName) {
-  console.log("cvid:", cvId);
-  try {
-    const response = await fetch(
-      `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${cvId}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
-    );
+  async function downloadCV(cvId, cvFileName) {
+    console.log("cvid:", cvId);
+    try {
+      const response = await fetch(
+        `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${cvId}&apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
+      );
 
-    if (response.ok) {
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = cvFileName; // Use the provided CV file name
-      link.target = "_blank"; // Open the file in a new tab/window
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } else {
-      console.error("Failed to download CV.");
+      if (response.ok) {
+        const arrayBuffer = await response.arrayBuffer();
+        const file = new Blob([arrayBuffer], { type: "application/octet-stream" });
+        const url = URL.createObjectURL(file);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = cvFileName; // Use the provided CV file name
+        link.click();
+        URL.revokeObjectURL(url);
+      } else {
+        console.error("Failed to download CV.");
+      }
+    } catch (error) {
+      console.error("Error while downloading CV:", error);
     }
-  } catch (error) {
-    console.error("Error while downloading CV:", error);
   }
-}
 
   function handleSave() {
     // Perform save logic
