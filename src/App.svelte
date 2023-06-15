@@ -125,7 +125,7 @@
 	cvUploadButton.addEventListener("click", async function () {
         const rowData = options.data;
 	selectedRowData = rowData;
-        isCVUploadPopupVisible = false;
+        isCVUploadPopupVisible = true;
          try {
       const file = await getFileFromUser(); // Prompt the user to select a file
       if (file) {
