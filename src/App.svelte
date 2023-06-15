@@ -1,5 +1,5 @@
 <script>
-  import { onMount, afterUpdate, onDestroy } from "svelte";
+  import { onMount } from "svelte";
   import "bootstrap/dist/css/bootstrap.min.css";
   import DevExpress from "devextreme";
 
@@ -7,7 +7,6 @@
   let gridData = [];
   let isCVUploadPopupVisible = false;
   let isViewCvPopupVisible = false;
-  let cvHtml = "";
 
   onMount(async () => {
     const response = await fetch(
@@ -60,21 +59,8 @@
 
           const viewButton = document.createElement("button");
           viewButton.innerText = "View CV";
-          viewButton.addEventListener("click", async () => {
-            const cvResponse = await fetch(
-              `https://api.recruitly.io/api/candidatecv/${options.data.id}?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
-            );
-            if (cvResponse.ok) {
-              const cvData = await cvResponse.json();
-              cvHtml = cvData.html;
-              if (cvHtml) {
-                isViewCvPopupVisible = true;
-              } else {
-                alert("CV file not found.");
-              }
-            } else {
-              alert("Failed to fetch CV file.");
-            }
+          viewButton.addEventListener("click", () => {
+            isViewCvPopupVisible = true;
           });
           container.appendChild(viewButton);
         },
@@ -145,10 +131,22 @@
             console.log(e);
             var newData = {
               id: e.key.id,
-              firstName: e.newData.firstName === undefined ? e.oldData.firstName : e.newData.firstName,
-              surname: e.newData.surname === undefined ? e.oldData.surname : e.newData.surname,
-              email: e.newData.email === undefined ? e.oldData.email : e.newData.email,
-              mobile: e.newData.mobile === undefined ? e.oldData.mobile : e.newData.mobile,
+              firstName:
+                e.newData.firstName === undefined
+                  ? e.oldData.firstName
+                  : e.newData.firstName,
+              surname:
+                e.newData.surname === undefined
+                  ? e.oldData.surname
+                  : e.newData.surname,
+              email:
+                e.newData.email === undefined
+                  ? e.oldData.email
+                  : e.newData.email,
+              mobile:
+                e.newData.mobile === undefined
+                  ? e.oldData.mobile
+                  : e.newData.mobile,
             };
 
             console.log(newData);
@@ -164,7 +162,9 @@
             );
             const responseData = await response.json();
             if (response.ok) {
-              const updatedItemIndex = gridData.findIndex((item) => item.id === e.key);
+              const updatedItemIndex = gridData.findIndex(
+                (item) => item.id === e.key
+              );
               gridData.push(e.newData);
               gridData[updatedItemIndex] = e.newData;
               dataGrid.refresh();
@@ -185,7 +185,9 @@
               }
             );
             if (response.ok) {
-              const removedItemIndex = gridData.findIndex((item) => item.id === e.key);
+              const removedItemIndex = gridData.findIndex(
+                (item) => item.id === e.key
+              );
               if (removedItemIndex > -1) {
                 gridData.splice(removedItemIndex, 1);
                 dataGrid.refresh();
@@ -200,27 +202,7 @@
         onInitialized: () => {},
       }
     );
-
-    let isCVUploadPopupVisible = false;
-    let isViewCvPopupVisible = false;
-
-    function openUploadPopup(id) {
-      isCVUploadPopupVisible = true;
-      selectedCandidateId = id;
-    }
-
-    function closeUploadPopup() {
-      isCVUploadPopupVisible = false;
-    }
-
-    function openViewCvPopup(id) {
-      isViewCvPopupVisible = true;
-      selectedCandidateId = id;
-    }
-
-    function closeViewCvPopup() {
-      isViewCvPopupVisible = false;
-    }
+  });
 </script>
 
 <style>
@@ -277,9 +259,8 @@
 {#if isCVUploadPopupVisible}
   <div class="cv-popup">
     <div class="cv-popup-content">
-      <h3>Upload CV</h3>
-      <input type="file" accept=".pdf,.doc,.docx" />
-      <button on:click={closeUploadPopup}>Close</button>
+      <button class="cv-popup-close" on:click={() => isCVUploadPopupVisible = false}>Close</button>
+      <input type="file" accept=".pdf,.doc,.docx" on:change={handleFileUpload} />
     </div>
   </div>
 {/if}
@@ -287,11 +268,8 @@
 {#if isViewCvPopupVisible}
   <div class="cv-popup">
     <div class="cv-popup-content">
-      <h3>View CV</h3>
-      <div>
-        <!-- Display CV content here -->
-      </div>
-      <button on:click={closeViewCvPopup}>Close</button>
+      <button class="cv-popup-close" on:click={() => isViewCvPopupVisible = false}>Close</button>
+      {@html cvHtml}
     </div>
   </div>
 {/if}
