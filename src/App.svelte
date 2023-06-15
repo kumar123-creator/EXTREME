@@ -358,32 +358,13 @@
     right: 10px;
     cursor: pointer;
   }
-	
-	.action-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
+	.btn-success {
+    background-color: #28a745; /* Set the success button color */
   }
 
-  .action-buttons button {
-    margin-right: 10px;
+  .btn-primary {
+    background-color: #007bff; /* Set the primary button color */
   }
-
-  .upload-button {
-    background-color: #5cb85c;
-    color: white;
-  }
-
-  .download-button {
-    background-color: #5bc0de;
-    color: white;
-  }
-
-  .view-button {
-    background-color: #337ab7;
-    color: white;
-  }
-
 </style>
 
 <div id="dataGrid"></div>
