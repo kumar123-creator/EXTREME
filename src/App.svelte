@@ -55,15 +55,16 @@
 	  // Close the CV upload popup
 	  isCVUploadPopupVisible = false;
 	}
-  
+
 	function handleClose() {
-	  // Perform close logic
-	  console.log("Close clicked");
-  
-	  // Close the CV upload popup or CV view popup
-	  isCVUploadPopupVisible = false;
-	   $(".cv-modal").modal("hide");
-	}
+  // Perform close logic
+  console.log("Close clicked");
+
+  // Close the CV upload popup or CV view popup
+  isCVUploadPopupVisible = false;
+  isCVViewPopupVisible = false;
+}
+
 	
   onMount(async () => {
     const response = await fetch(
@@ -131,38 +132,19 @@
           viewButton.innerText = "View CV";
 	  viewButton.style.marginRight = "10px";
           viewButton.addEventListener("click", async () => {
-          const cvResponse = await fetch(
-                                        `https://api.recruitly.io/api/candidatecv/${options.data.id}?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
-                                          );
+  const cvResponse = await fetch(
+    `https://api.recruitly.io/api/candidatecv/${options.data.id}?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
+  );
   if (cvResponse.ok) {
     const cvData = await cvResponse.json();
     const cvHtml = cvData.html;
-   if (cvHtml) {
-      const modalElement = document.createElement("div");
-      modalElement.classList.add("modal", "cv-modal");
-      modalElement.innerHTML = `
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">View CV</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              ${cvHtml}
-            </div>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modalElement);
+    if (cvHtml) {
+      isCVViewPopupVisible = true; // Show the CV view popup
+      selectedRowData = options.data; // Set the selectedRowData for reference
 
-      $(modalElement).modal("show");
-
-      // Remove the modal from the DOM when it's closed
-      $(modalElement).on("hidden.bs.modal", function () {
-        document.body.removeChild(modalElement);
-      });
+      // Update the CV view popup content with the CV HTML
+      const cvPopupContent = document.getElementById("cvPopupContent");
+      cvPopupContent.innerHTML = cvHtml;
     } else {
       alert("CV file not found.");
     }
@@ -170,7 +152,6 @@
     alert("Failed to fetch CV.");
   }
 });
-
 
           container.appendChild(viewButton);
         },
@@ -383,3 +364,15 @@
   </div>
 </div>
 {/if}
+
+{#if isCVViewPopupVisible}
+<div class="cv-popup">
+  <div class="cv-popup-content">
+    <div id="cvPopupContent"></div>
+    <div class="action-buttons">
+      <button on:click={handleClose} class="btn btn-secondary">Close</button>
+    </div>
+  </div>
+</div>
+{/if}
+
