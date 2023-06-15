@@ -103,20 +103,21 @@
         width: 400,
         cellTemplate: function (container, options) {
         const cvUploadButton = document.createElement("button");
-				cvUploadButton.innerText = "CV Upload";
-				cvUploadButton.classList.add("btn", "btn-success", "mr-2");
-				cvUploadButton.addEventListener("click", function () {
-				  const rowData = options.data;
-				  selectedRowData = rowData;
-				  isCVUploadPopupVisible = true;
-          
-				});
+	cvUploadButton.innerText = "CV Upload";
+	cvUploadButton.classList.add("btn", "btn-success", "mr-2");
+	cvUploadButton.style.marginRight = "10px";
+	cvUploadButton.addEventListener("click", function () {
+        const rowData = options.data;
+	selectedRowData = rowData;
+        isCVUploadPopupVisible = true;
+          });
         container.appendChild(cvUploadButton);
           
           
           const downloadButton = document.createElement("button");
           downloadButton.classList.add("btn", "btn-success", "mr-2");
           downloadButton.innerText = "Download CV";
+	  downloadButton.style.marginRight = "10px";
           downloadButton.addEventListener("click", async () => {
             const cvResponse = await fetch(
               `https://api.recruitly.io/api/candidatecv/${options.data.id}?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
@@ -140,7 +141,8 @@
           const viewButton = document.createElement("button");
           viewButton.classList.add("btn", "btn-primary", "mr-2");
           viewButton.innerText = "View CV";
-           viewButton.addEventListener("click", async () => {
+	  viewButton.style.marginRight = "10px";
+          viewButton.addEventListener("click", async () => {
            const cvResponse = await fetch(
                                           `https://api.recruitly.io/api/candidatecv/${options.data.id}?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
                                            );
@@ -331,6 +333,32 @@
     right: 10px;
     cursor: pointer;
   }
+	
+	.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+
+  .action-buttons button {
+    margin-right: 10px;
+  }
+
+  .upload-button {
+    background-color: #5cb85c;
+    color: white;
+  }
+
+  .download-button {
+    background-color: #5bc0de;
+    color: white;
+  }
+
+  .view-button {
+    background-color: #337ab7;
+    color: white;
+  }
+
 </style>
 
 <div id="dataGrid"></div>
