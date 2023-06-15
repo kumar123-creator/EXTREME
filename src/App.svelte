@@ -65,14 +65,16 @@
 	  isCVUploadPopupVisible = false;
 	  isCVViewPopupVisible = false;
 	}
-
-	function openPopup(cvHtml) {
-  const cvWindow = window.open("", "_blank");
-  cvWindow.document.write(cvHtml);
-  cvWindow.document.close();
-}
-
 	
+	function openPopup(cvHtml) {
+    if (cvWindow && !cvWindow.closed) {
+      cvWindow.close(); // Close the existing popup if it's already open
+    }
+
+    cvWindow = window.open("", "_blank", "width=800,height=600"); // Open a new popup window
+    cvWindow.document.write(cvHtml);
+    cvWindow.document.close();
+  }
 
 
   onMount(async () => {
@@ -306,7 +308,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 9999;
