@@ -1,14 +1,13 @@
 <script>
-  import { onMount, createSignal } from "svelte";
+  import { onMount } from "svelte";
   import "bootstrap/dist/css/bootstrap.min.css";
   import DevExpress from "devextreme";
 
   let jsonData = [];
   let gridData = [];
-
-  const [isCVUploadPopupVisible, setCVUploadPopupVisible] = createSignal(false);
-  const [isViewCvPopupVisible, setViewCvPopupVisible] = createSignal(false);
-  const [cvContent, setCvContent] = createSignal("");
+  let isCVUploadPopupVisible = false;
+  let isViewCvPopupVisible = false;
+  let cvHtmlContent = "";
 
   onMount(async () => {
     const response = await fetch(
@@ -38,7 +37,7 @@
           const uploadButton = document.createElement("button");
           uploadButton.innerText = "Upload CV";
           uploadButton.addEventListener("click", () => {
-            setCVUploadPopupVisible(true);
+            isCVUploadPopupVisible = true;
           });
           container.appendChild(uploadButton);
 
@@ -69,8 +68,8 @@
               const cvData = await cvResponse.json();
               const cvHtml = cvData.html;
               if (cvHtml) {
-                setCvContent(cvHtml);
-                setViewCvPopupVisible(true);
+                cvHtmlContent = cvHtml;
+                isViewCvPopupVisible = true;
               } else {
                 alert("CV file not found.");
               }
@@ -291,4 +290,4 @@
   </div>
 </div>
 {/if}
-
+</div>
