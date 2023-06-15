@@ -1,12 +1,14 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount, createSignal } from "svelte";
   import "bootstrap/dist/css/bootstrap.min.css";
   import DevExpress from "devextreme";
 
   let jsonData = [];
   let gridData = [];
-  let isCVUploadPopupVisible = false;
-  let isViewCvPopupVisible = false;
+
+  const [isCVUploadPopupVisible, setCVUploadPopupVisible] = createSignal(false);
+  const [isViewCvPopupVisible, setViewCvPopupVisible] = createSignal(false);
+  const [cvContent, setCvContent] = createSignal("");
 
   onMount(async () => {
     const response = await fetch(
@@ -36,7 +38,7 @@
           const uploadButton = document.createElement("button");
           uploadButton.innerText = "Upload CV";
           uploadButton.addEventListener("click", () => {
-            isCVUploadPopupVisible = true;
+            setCVUploadPopupVisible(true);
           });
           container.appendChild(uploadButton);
 
@@ -59,8 +61,22 @@
 
           const viewButton = document.createElement("button");
           viewButton.innerText = "View CV";
-          viewButton.addEventListener("click", () => {
-            isViewCvPopupVisible = true;
+          viewButton.addEventListener("click", async () => {
+            const cvResponse = await fetch(
+              `https://api.recruitly.io/api/candidatecv/${options.data.id}?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
+            );
+            if (cvResponse.ok) {
+              const cvData = await cvResponse.json();
+              const cvHtml = cvData.html;
+              if (cvHtml) {
+                setCvContent(cvHtml);
+                setViewCvPopupVisible(true);
+              } else {
+                alert("CV file not found.");
+              }
+            } else {
+              alert("Failed to fetch CV file.");
+            }
           });
           container.appendChild(viewButton);
         },
@@ -257,19 +273,22 @@
 <div id="dataGrid"></div>
 
 {#if isCVUploadPopupVisible}
-  <div class="cv-popup">
-    <div class="cv-popup-content">
-      <button class="cv-popup-close" on:click={() => isCVUploadPopupVisible = false}>Close</button>
-      <input type="file" accept=".pdf,.doc,.docx" on:change={handleFileUpload} />
-    </div>
+<div class="cv-popup">
+  <div class="cv-popup-content">
+    <h2>Upload CV</h2>
+    <input type="file" accept=".pdf,.doc,.docx" on:change={handleCVUpload} />
+    <button on:click={closeCVUploadPopup}>Close</button>
   </div>
+</div>
 {/if}
 
 {#if isViewCvPopupVisible}
-  <div class="cv-popup">
-    <div class="cv-popup-content">
-      <button class="cv-popup-close" on:click={() => isViewCvPopupVisible = false}>Close</button>
-      {@html cvHtml}
-    </div>
+<div class="cv-popup">
+  <div class="cv-popup-content">
+    <h2>View CV</h2>
+    <div>{cvContent}</div>
+    <button on:click={closeViewCvPopup}>Close</button>
   </div>
+</div>
 {/if}
+</div>
