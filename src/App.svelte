@@ -388,7 +388,7 @@
 
 <div id="dataGrid"></div>
 
-{#if isCVUploadPopupVisible}
+{#if isCVUploadPopupVisible === true}
 <div class="cv-popup">
   <div class="cv-popup-content">
   <h3>Upload CV</h3>
