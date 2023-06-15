@@ -6,8 +6,65 @@
   let jsonData = [];
   let gridData = [];
   let isCVUploadPopupVisible = false;
-  let isViewCvPopupVisible = false;
-  let cvHtmlContent = "";
+  let isCVViewPopupVisible = false;
+	let selectedRowData = null;
+  
+   async function uploadCV(file) {
+	  // Perform further actions with the uploaded file
+  
+	  // Example: Update the backend API URL with the file upload
+	  const formData = new FormData();
+	  formData.append("file", file);
+  
+	  if (selectedRowData) {
+		const uploadCandidateId = selectedRowData.id; // Get the candidate ID from selectedRowData
+  
+		try {
+		  const response = await fetch(
+			`https://api.recruitly.io/api/candidatecv/upload?apiKey=TEST1236C4CF23E6921C41429A6E1D546AC9535E&candidateId=${uploadCandidateId}`,
+			{
+			  method: "POST",
+			  body: formData,
+			}
+		  );
+  
+		  if (response.ok) {
+        alert("file uploaded successfully");
+			console.log("CV uploaded successfully!");
+      console.log(uploadCandidateId);
+			// Perform any additional actions upon successful upload
+		  } else {
+			console.error("CV upload fail.");
+			// Handle the error accordingly
+		  }
+		} catch (error) {
+		  console.error("CV upload error:", error);
+		  // Handle the error accordingly
+		}
+	  }
+  
+	  // Close the CV upload popup
+	  isCVUploadPopupVisible = false;
+	}
+  function handleSave() {
+	  // Perform save logic
+	  // In this case, we're updating the backend API URL in the handleSave function
+	  console.log("Save clicked");
+  
+	  // Close the CV upload popup
+	  isCVUploadPopupVisible = false;
+	}
+  
+	function handleClose() {
+	  // Perform close logic
+	  console.log("Close clicked");
+  
+	  // Close the CV upload popup or CV view popup
+	  isCVUploadPopupVisible = false;
+	  isCVViewPopupVisible = false;
+	}
+  
+
 
   onMount(async () => {
     const response = await fetch(
@@ -34,14 +91,20 @@
         caption: "Actions",
         width: 400,
         cellTemplate: function (container, options) {
-          const uploadButton = document.createElement("button");
-          uploadButton.innerText = "Upload CV";
-          uploadButton.addEventListener("click", () => {
-            isCVUploadPopupVisible = true;
-          });
-          container.appendChild(uploadButton);
-
+        const cvUploadButton = document.createElement("button");
+				cvUploadButton.innerText = "CV Upload";
+				cvUploadButton.classList.add("btn", "btn-success", "mr-2");
+				cvUploadButton.addEventListener("click", function () {
+				  const rowData = options.data;
+				  selectedRowData = rowData;
+				  isCVUploadPopupVisible = true;
+          
+				});
+        container.appendChild(cvUploadButton);
+          
+          
           const downloadButton = document.createElement("button");
+          downloadButton.classList.add("btn", "btn-success", "mr-2");
           downloadButton.innerText = "Download CV";
           downloadButton.addEventListener("click", async () => {
             const cvResponse = await fetch(
@@ -49,9 +112,14 @@
             );
             if (cvResponse.ok) {
               const cvData = await cvResponse.json();
+              console.log(cvData);
               const cvId = cvData.internal.cloudFile.id;
+              console.log(cvData.internal.cloudFile);
+              console.log(cvId);
+
               const downloadLink = `https://api.recruitly.io/api/cloudfile/download?cloudFileId=${cvId}&apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77`;
               window.open(downloadLink);
+              alert("file downloaded successfully");
             } else {
               alert("Failed to fetch CV file.");
             }
@@ -59,6 +127,7 @@
           container.appendChild(downloadButton);
 
           const viewButton = document.createElement("button");
+          viewButton.classList.add("btn", "btn-primary", "mr-2");
           viewButton.innerText = "View CV";
           viewButton.addEventListener("click", async () => {
             const cvResponse = await fetch(
@@ -68,13 +137,13 @@
               const cvData = await cvResponse.json();
               const cvHtml = cvData.html;
               if (cvHtml) {
-                cvHtmlContent = cvHtml;
-                isViewCvPopupVisible = true;
+               cvWindow.document.write(cvHtml);
+                cvWindow.document.close();
               } else {
                 alert("CV file not found.");
               }
             } else {
-              alert("Failed to fetch CV file.");
+              alert("Failed to fetch CV.");
             }
           });
           container.appendChild(viewButton);
@@ -146,22 +215,10 @@
             console.log(e);
             var newData = {
               id: e.key.id,
-              firstName:
-                e.newData.firstName === undefined
-                  ? e.oldData.firstName
-                  : e.newData.firstName,
-              surname:
-                e.newData.surname === undefined
-                  ? e.oldData.surname
-                  : e.newData.surname,
-              email:
-                e.newData.email === undefined
-                  ? e.oldData.email
-                  : e.newData.email,
-              mobile:
-                e.newData.mobile === undefined
-                  ? e.oldData.mobile
-                  : e.newData.mobile,
+              firstName: e.newData.firstName === undefined ? e.oldData.firstName : e.newData.firstName,
+              surname: e.newData.surname === undefined ? e.oldData.surname : e.newData.surname,
+              email: e.newData.email === undefined ? e.oldData.email : e.newData.email,
+              mobile: e.newData.mobile === undefined ? e.oldData.mobile : e.newData.mobile,
             };
 
             console.log(newData);
@@ -177,9 +234,7 @@
             );
             const responseData = await response.json();
             if (response.ok) {
-              const updatedItemIndex = gridData.findIndex(
-                (item) => item.id === e.key
-              );
+              const updatedItemIndex = gridData.findIndex((item) => item.id === e.key);
               gridData.push(e.newData);
               gridData[updatedItemIndex] = e.newData;
               dataGrid.refresh();
@@ -200,9 +255,7 @@
               }
             );
             if (response.ok) {
-              const removedItemIndex = gridData.findIndex(
-                (item) => item.id === e.key
-              );
+              const removedItemIndex = gridData.findIndex((item) => item.id === e.key);
               if (removedItemIndex > -1) {
                 gridData.splice(removedItemIndex, 1);
                 dataGrid.refresh();
@@ -274,20 +327,14 @@
 {#if isCVUploadPopupVisible}
 <div class="cv-popup">
   <div class="cv-popup-content">
-    <h2>Upload CV</h2>
-    <input type="file" accept=".pdf,.doc,.docx" on:change={handleCVUpload} />
-    <button on:click={closeCVUploadPopup}>Close</button>
+  <h3>Upload CV</h3>
+  <input
+    type="file"
+    on:change="{(event) => uploadCV(event.target.files[0])}"
+    accept=".pdf,.doc,.docx"
+  />
+  <button on:click={handleSave} class="btn btn-primary">Save</button>
+  <button on:click={handleClose} class="btn btn-secondary">Close</button>
   </div>
 </div>
 {/if}
-
-{#if isViewCvPopupVisible}
-<div class="cv-popup">
-  <div class="cv-popup-content">
-    <h2>View CV</h2>
-    <div>{cvContent}</div>
-    <button on:click={closeViewCvPopup}>Close</button>
-  </div>
-</div>
-{/if}
-</div>
