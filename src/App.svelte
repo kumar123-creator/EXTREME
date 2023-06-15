@@ -7,7 +7,9 @@
   let gridData = [];
   let isCVUploadPopupVisible = false;
   let isCVViewPopupVisible = false;
-	let selectedRowData = null;
+  let selectedRowData = null;
+  let cvWindow = null;
+
   
    async function uploadCV(file) {
 	  // Perform further actions with the uploaded file
@@ -63,7 +65,14 @@
 	  isCVUploadPopupVisible = false;
 	  isCVViewPopupVisible = false;
 	}
-  
+
+	function openPopup(cvHtml) {
+  const cvWindow = window.open("", "_blank");
+  cvWindow.document.write(cvHtml);
+  cvWindow.document.close();
+}
+
+	
 
 
   onMount(async () => {
@@ -129,23 +138,23 @@
           const viewButton = document.createElement("button");
           viewButton.classList.add("btn", "btn-primary", "mr-2");
           viewButton.innerText = "View CV";
-          viewButton.addEventListener("click", async () => {
-            const cvResponse = await fetch(
-              `https://api.recruitly.io/api/candidatecv/${options.data.id}?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
-            );
-            if (cvResponse.ok) {
-              const cvData = await cvResponse.json();
-              const cvHtml = cvData.html;
-              if (cvHtml) {
-               cvWindow.document.write(cvHtml);
-                cvWindow.document.close();
-              } else {
-                alert("CV file not found.");
-              }
-            } else {
-              alert("Failed to fetch CV.");
-            }
-          });
+           viewButton.addEventListener("click", async () => {
+           const cvResponse = await fetch(
+                                          `https://api.recruitly.io/api/candidatecv/${options.data.id}?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
+                                           );
+          if (cvResponse.ok) {
+         const cvData = await cvResponse.json();
+         const cvHtml = cvData.html;
+           if (cvHtml) {
+                         openPopup(cvHtml); // Open the CV view popup
+                         } else {
+                  alert("CV file not found.");
+                                }
+                 } else {
+                 alert("Failed to fetch CV.");
+                 }
+             });
+
           container.appendChild(viewButton);
         },
         width: 400,
