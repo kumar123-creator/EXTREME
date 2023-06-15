@@ -8,7 +8,6 @@
   let isCVUploadPopupVisible = false;
   let isCVViewPopupVisible = false;
   let selectedRowData = null;
-  let cvWindow = null;
 
   
    async function uploadCV(file) {
@@ -63,36 +62,9 @@
   
 	  // Close the CV upload popup or CV view popup
 	  isCVUploadPopupVisible = false;
-	  isCVViewPopupVisible = false;
+	   $(".cv-modal").modal("hide");
 	}
 	
-	function openPopup(cvHtml) {
-    if (cvWindow && !cvWindow.closed) {
-      cvWindow.close(); // Close the existing popup if it's already open
-    }
-
-    cvWindow = window.open("", "_blank", "width=800,height=600"); // Open a new popup window
-    cvWindow.document.write(cvHtml);
-    cvWindow.document.close();
-  }
-	
-  function getFileFromUser() {
-    return new Promise((resolve, reject) => {
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = ".pdf,.doc,.docx";
-      input.onchange = () => {
-        if (input.files && input.files.length > 0) {
-          resolve(input.files[0]);
-        } else {
-          reject(new Error("No file selected"));
-        }
-      };
-      input.click();
-    });
-  }
-
-
   onMount(async () => {
     const response = await fetch(
       "https://api.recruitly.io/api/candidate?apiKey=TEST9349C0221517DA4942E39B5DF18C68CDA154"
@@ -124,17 +96,8 @@
 	cvUploadButton.style.marginRight = "10px";
 	cvUploadButton.addEventListener("click", async function () {
         const rowData = options.data;
-	selectedRowData = rowData;
+      	selectedRowData = rowData;
         isCVUploadPopupVisible = true;
-         try {
-      const file = await getFileFromUser(); // Prompt the user to select a file
-      if (file) {
-        await uploadCV(file); // Upload the selected file
-      }
-    } catch (error) {
-      console.error("CV upload error:", error);
-      // Handle the error accordingly
-    }
   });
   container.appendChild(cvUploadButton);
 
@@ -142,7 +105,7 @@
           const downloadButton = document.createElement("button");
           downloadButton.classList.add("btn", "btn-success", "mr-2");
           downloadButton.innerText = "Download CV";
-	  downloadButton.style.marginRight = "10px";
+	        downloadButton.style.marginRight = "10px";
           downloadButton.addEventListener("click", async () => {
             const cvResponse = await fetch(
               `https://api.recruitly.io/api/candidatecv/${options.data.id}?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
@@ -168,21 +131,46 @@
           viewButton.innerText = "View CV";
 	  viewButton.style.marginRight = "10px";
           viewButton.addEventListener("click", async () => {
-           const cvResponse = await fetch(
-                                          `https://api.recruitly.io/api/candidatecv/${options.data.id}?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
-                                           );
-          if (cvResponse.ok) {
-         const cvData = await cvResponse.json();
-         const cvHtml = cvData.html;
-           if (cvHtml) {
-                         openPopup(cvHtml); // Open the CV view popup
-                         } else {
-                  alert("CV file not found.");
-                                }
-                 } else {
-                 alert("Failed to fetch CV.");
-                 }
-             });
+          const cvResponse = await fetch(
+                                        `https://api.recruitly.io/api/candidatecv/${options.data.id}?apiKey=TEST27306FA00E70A0F94569923CD689CA9BE6CA`
+                                          );
+  if (cvResponse.ok) {
+    const cvData = await cvResponse.json();
+    const cvHtml = cvData.html;
+   if (cvHtml) {
+      const modalElement = document.createElement("div");
+      modalElement.classList.add("modal", "cv-modal");
+      modalElement.innerHTML = `
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">View CV</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              ${cvHtml}
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modalElement);
+
+      $(modalElement).modal("show");
+
+      // Remove the modal from the DOM when it's closed
+      $(modalElement).on("hidden.bs.modal", function () {
+        document.body.removeChild(modalElement);
+      });
+    } else {
+      alert("CV file not found.");
+    }
+  } else {
+    alert("Failed to fetch CV.");
+  }
+});
+
 
           container.appendChild(viewButton);
         },
@@ -335,7 +323,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9999;
@@ -358,18 +346,30 @@
     right: 10px;
     cursor: pointer;
   }
-	.btn-success {
-    background-color: #28a745; /* Set the success button color */
+  
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
   }
 
-  .btn-primary {
-    background-color: #007bff; /* Set the primary button color */
+  .action-buttons button {
+    margin-right: 10px;
   }
+	
+	.cv-modal .modal-dialog {
+    max-width: 800px;
+  }
+
+  .cv-modal .modal-content {
+    padding: 20px;
+  }
+
 </style>
 
 <div id="dataGrid"></div>
 
-{#if isCVUploadPopupVisible === true}
+{#if isCVUploadPopupVisible}
 <div class="cv-popup">
   <div class="cv-popup-content">
   <h3>Upload CV</h3>
