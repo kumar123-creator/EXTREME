@@ -75,6 +75,22 @@
     cvWindow.document.write(cvHtml);
     cvWindow.document.close();
   }
+	
+  function getFileFromUser() {
+    return new Promise((resolve, reject) => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".pdf,.doc,.docx";
+      input.onchange = () => {
+        if (input.files && input.files.length > 0) {
+          resolve(input.files[0]);
+        } else {
+          reject(new Error("No file selected"));
+        }
+      };
+      input.click();
+    });
+  }
 
 
   onMount(async () => {
@@ -106,14 +122,23 @@
 	cvUploadButton.innerText = "CV Upload";
 	cvUploadButton.classList.add("btn", "btn-success", "mr-2");
 	cvUploadButton.style.marginRight = "10px";
-	cvUploadButton.addEventListener("click", function () {
+	cvUploadButton.addEventListener("click", async function () {
         const rowData = options.data;
 	selectedRowData = rowData;
-        isCVUploadPopupVisible = true;
-          });
-        container.appendChild(cvUploadButton);
-          
-          
+        isCVUploadPopupVisible = false;
+         try {
+      const file = await getFileFromUser(); // Prompt the user to select a file
+      if (file) {
+        await uploadCV(file); // Upload the selected file
+      }
+    } catch (error) {
+      console.error("CV upload error:", error);
+      // Handle the error accordingly
+    }
+  });
+  container.appendChild(cvUploadButton);
+
+
           const downloadButton = document.createElement("button");
           downloadButton.classList.add("btn", "btn-success", "mr-2");
           downloadButton.innerText = "Download CV";
